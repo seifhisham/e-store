@@ -1,0 +1,304 @@
+'use client'
+
+import { useState } from 'react'
+import { useCart } from '@/contexts/CartContext'
+import { useAuth } from '@/contexts/AuthContext'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
+import { getPaymob } from '@/lib/paymob'
+import { useRouter } from 'next/navigation'
+import { CreditCard, Lock } from 'lucide-react'
+
+export default function CheckoutPage() {
+  const { items, getTotalPrice, clearCart } = useCart()
+  const { user } = useAuth()
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [shippingAddress, setShippingAddress] = useState({
+    firstName: '',
+    lastName: '',
+    email: user?.email || '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'US'
+  })
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setShippingAddress(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cartItems: items,
+          shippingAddress
+        })
+      })
+
+      const { paymentToken, orderId, iframeUrl, error } = await response.json()
+      if (error) throw new Error(error)
+
+      // Redirect to Paymob payment page
+      if (iframeUrl) {
+        window.location.href = iframeUrl
+      } else {
+        // Fallback: use Paymob SDK if iframe URL is not available
+        const paymob = getPaymob()
+        if (paymob && paymentToken) {
+          paymob.checkoutButton(paymentToken).mount('#paymob-checkout')
+        }
+      }
+    } catch (error) {
+      console.error('Checkout error:', error)
+      alert('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const subtotal = getTotalPrice()
+  const shipping = subtotal >= 50 ? 0 : 9.99
+  const tax = (subtotal + shipping) * 0.08
+  const total = subtotal + shipping + tax
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Checkout Form */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Shipping Information */}
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Shipping Information</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      First Name *
+                    </label>
+                    <Input
+                      name="firstName"
+                      required
+                      value={shippingAddress.firstName}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Last Name *
+                    </label>
+                    <Input
+                      name="lastName"
+                      required
+                      value={shippingAddress.lastName}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email *
+                  </label>
+                  <Input
+                    name="email"
+                    type="email"
+                    required
+                    value={shippingAddress.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Address *
+                  </label>
+                  <Input
+                    name="address"
+                    required
+                    value={shippingAddress.address}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      City *
+                    </label>
+                    <Input
+                      name="city"
+                      required
+                      value={shippingAddress.city}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      State *
+                    </label>
+                    <Select
+                      name="state"
+                      required
+                      value={shippingAddress.state}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select State</option>
+                      <option value="AL">Alabama</option>
+                      <option value="AK">Alaska</option>
+                      <option value="AZ">Arizona</option>
+                      <option value="AR">Arkansas</option>
+                      <option value="CA">California</option>
+                      <option value="CO">Colorado</option>
+                      <option value="CT">Connecticut</option>
+                      <option value="DE">Delaware</option>
+                      <option value="FL">Florida</option>
+                      <option value="GA">Georgia</option>
+                      <option value="HI">Hawaii</option>
+                      <option value="ID">Idaho</option>
+                      <option value="IL">Illinois</option>
+                      <option value="IN">Indiana</option>
+                      <option value="IA">Iowa</option>
+                      <option value="KS">Kansas</option>
+                      <option value="KY">Kentucky</option>
+                      <option value="LA">Louisiana</option>
+                      <option value="ME">Maine</option>
+                      <option value="MD">Maryland</option>
+                      <option value="MA">Massachusetts</option>
+                      <option value="MI">Michigan</option>
+                      <option value="MN">Minnesota</option>
+                      <option value="MS">Mississippi</option>
+                      <option value="MO">Missouri</option>
+                      <option value="MT">Montana</option>
+                      <option value="NE">Nebraska</option>
+                      <option value="NV">Nevada</option>
+                      <option value="NH">New Hampshire</option>
+                      <option value="NJ">New Jersey</option>
+                      <option value="NM">New Mexico</option>
+                      <option value="NY">New York</option>
+                      <option value="NC">North Carolina</option>
+                      <option value="ND">North Dakota</option>
+                      <option value="OH">Ohio</option>
+                      <option value="OK">Oklahoma</option>
+                      <option value="OR">Oregon</option>
+                      <option value="PA">Pennsylvania</option>
+                      <option value="RI">Rhode Island</option>
+                      <option value="SC">South Carolina</option>
+                      <option value="SD">South Dakota</option>
+                      <option value="TN">Tennessee</option>
+                      <option value="TX">Texas</option>
+                      <option value="UT">Utah</option>
+                      <option value="VT">Vermont</option>
+                      <option value="VA">Virginia</option>
+                      <option value="WA">Washington</option>
+                      <option value="WV">West Virginia</option>
+                      <option value="WI">Wisconsin</option>
+                      <option value="WY">Wyoming</option>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      ZIP Code *
+                    </label>
+                    <Input
+                      name="zipCode"
+                      required
+                      value={shippingAddress.zipCode}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Button */}
+              <div className="pt-6 border-t">
+                <Button
+                  type="submit"
+                  disabled={loading || items.length === 0}
+                  className="w-full bg-indigo-600 hover:bg-indigo-700"
+                  size="lg"
+                >
+                  {loading ? (
+                    'Processing...'
+                  ) : (
+                    <>
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Pay ${total.toFixed(2)}
+                    </>
+                  )}
+                </Button>
+                <p className="text-xs text-gray-500 mt-2 text-center flex items-center justify-center">
+                  <Lock className="w-3 h-3 mr-1" />
+                  Secure payment powered by Paymob
+                </p>
+              </div>
+            </form>
+          </div>
+
+          {/* Order Summary */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+            
+            <div className="space-y-3 mb-6">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Subtotal</span>
+                <span className="font-medium">${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Shipping</span>
+                <span className="font-medium">
+                  {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Tax</span>
+                <span className="font-medium">${tax.toFixed(2)}</span>
+              </div>
+              <div className="border-t pt-3">
+                <div className="flex justify-between text-lg font-semibold">
+                  <span>Total</span>
+                  <span>${total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Cart Items */}
+            <div className="border-t pt-4">
+              <h3 className="font-medium text-gray-900 mb-3">Items ({items.length})</h3>
+              <div className="space-y-2">
+                {items.map((item) => {
+                  const price = item.product.base_price + item.variant.price_adjustment
+                  return (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <span className="text-gray-600">
+                        {item.product.name} ({item.variant.size}, {item.variant.color}) x {item.quantity}
+                      </span>
+                      <span className="font-medium">${(price * item.quantity).toFixed(2)}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
