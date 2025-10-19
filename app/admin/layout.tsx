@@ -95,7 +95,7 @@ export default async function AdminLayout({
                     Users
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     href="/admin/customers"
                     className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
@@ -103,16 +103,16 @@ export default async function AdminLayout({
                     <Users className="w-4 h-4 mr-3" />
                     Customers
                   </Link>
-                </li>
-                <li>
+                </li> */}
+                {/* <li>
                   <Link
                     href="/admin/settings"
                     className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
                   >
                     <Settings className="w-4 h-4 mr-3" />
                     Settings
-                  </Link>
-                </li>
+                  </Link> */}
+                {/* </li> */}
               </ul>
             </nav>
           </div>

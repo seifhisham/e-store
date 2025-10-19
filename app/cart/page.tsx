@@ -169,7 +169,7 @@ export default function CartPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-black">Shipping</span>
                   <span className="font-medium text-black">
-                    {getTotalPrice() >= 50 ? 'Free' : formatCurrency(9.99)}
+                    {getTotalPrice() >= 500 ? 'Free' : formatCurrency(50)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -180,7 +180,7 @@ export default function CartPage() {
                   <div className="flex justify-between text-lg font-semibold text-black">
                     <span>Total</span>
                     <span>
-                      {formatCurrency(getTotalPrice() + (getTotalPrice() >= 50 ? 0 : 9.99) + (getTotalPrice() * 0.08))}
+                      {formatCurrency(getTotalPrice() + (getTotalPrice() >= 50 ? 0 : 50) + (getTotalPrice() * 0.08))}
                     </span>
                   </div>
                 </div>
@@ -199,9 +199,9 @@ export default function CartPage() {
                 </Link>
               </div>
               
-              {getTotalPrice() < 50 && (
+              {getTotalPrice() < 500 && (
                 <p className="text-sm text-black mt-4 text-center">
-                  Add {formatCurrency(Math.max(50 - getTotalPrice(), 0))} more for free shipping!
+                  Add {formatCurrency(Math.max(500 - getTotalPrice(), 0))} more for free shipping!
                 </p>
               )}
             </div>

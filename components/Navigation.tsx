@@ -19,14 +19,14 @@ export function Navigation() {
   return (
     <nav className="bg-rose-600 text-white shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="grid grid-cols-3 items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <h1 className="text-2xl font-bold text-white">E-Store</h1>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex justify-center items-center space-x-8">
             <Link href="/products" className="text-white/90 hover:text-white">
               Products
             </Link>
@@ -39,7 +39,7 @@ export function Navigation() {
           </div>
 
           {/* Right side - Cart and Auth */}
-          <div className="flex items-center space-x-4">
+          <div className="flex justify-end items-center space-x-3 md:space-x-4">
             {/* Cart */}
             <Link href="/cart" className="relative p-2 text-white/90 hover:text-white">
               <ShoppingCart className="h-6 w-6" />
@@ -53,7 +53,7 @@ export function Navigation() {
             {/* Auth */}
             {user ? (
               <div className="flex items-center space-x-2">
-                <Link href="/orders" className="text-foreground/80 hover:text-foreground">
+                <Link href="/orders" className="p-2 text-white/90 hover:text-white">
                   <User className="h-6 w-6" />
                 </Link>
                 <Button variant="outline" size="sm" onClick={handleSignOut}>

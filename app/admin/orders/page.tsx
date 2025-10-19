@@ -2,6 +2,25 @@ import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
 import { Package, Eye, CheckCircle, XCircle } from 'lucide-react'
+import { revalidatePath } from 'next/cache'
+
+// Server Action at module scope to avoid capturing component closures
+export async function updateOrderStatus(orderId: string, formData: FormData) {
+  'use server'
+
+  const supabase = await createClient()
+  const newStatus = String(formData.get('status') || 'pending')
+  const { error } = await supabase
+    .from('orders')
+    .update({ status: newStatus })
+    .eq('id', orderId)
+
+  if (error) {
+    console.error('Error updating order status:', error)
+  }
+
+  revalidatePath('/admin/orders')
+}
 
 export default async function AdminOrdersPage() {
   const supabase = await createClient()
@@ -26,18 +45,7 @@ export default async function AdminOrdersPage() {
     `)
     .order('created_at', { ascending: false })
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
-    'use server'
-    
-    const { error } = await supabase
-      .from('orders')
-      .update({ status: newStatus })
-      .eq('id', orderId)
-    
-    if (error) {
-      console.error('Error updating order status:', error)
-    }
-  }
+  
 
   return (
     <div className="space-y-6">
@@ -91,17 +99,11 @@ export default async function AdminOrdersPage() {
                       ${order.total_amount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <form action={updateOrderStatus.bind(null, order.id, 'completed')}>
+                      <form action={updateOrderStatus.bind(null, order.id)}>
                         <Select
                           defaultValue={order.status}
-                          onChange={(e) => {
-                            const form = e.target.closest('form')
-                            if (form) {
-                              const formData = new FormData(form)
-                              formData.set('status', e.target.value)
-                              form.requestSubmit()
-                            }
-                          }}
+                          name="status"
+                          onChange={(e) => e.currentTarget.form?.requestSubmit()}
                           className="text-sm"
                         >
                           <option value="pending">Pending</option>
