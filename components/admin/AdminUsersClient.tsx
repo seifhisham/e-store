@@ -93,12 +93,14 @@ export default function AdminUsersClient() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="text-black placeholder:text-black"
           />
           <Input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="text-black placeholder:text-black"
           />
           <Select value={newRole} onChange={(e) => setNewRole(e.target.value as 'admin' | 'user')}>
             <option value="user">User</option>
@@ -114,7 +116,7 @@ export default function AdminUsersClient() {
       <div className="bg-card text-card-foreground border border-border rounded-lg p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">All Users</h3>
-          <Button variant="outline" size="sm" onClick={loadUsers} disabled={loading}>
+          <Button onClick={loadUsers} disabled={loading}>
             Refresh
           </Button>
         </div>
@@ -148,7 +150,7 @@ export default function AdminUsersClient() {
                     </td>
                     <td className="py-2 pr-4">{new Date(u.created_at).toLocaleString()}</td>
                     <td className="py-2 pr-4">
-                      <Button variant="outline" size="sm" onClick={() => toggleRole(u.id, u.role)}>
+                      <Button onClick={() => toggleRole(u.id, u.role)}>
                         Make {u.role === 'admin' ? 'User' : 'Admin'}
                       </Button>
                     </td>
