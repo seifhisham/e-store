@@ -18,8 +18,16 @@ export default async function AdminLayout({
     redirect('/auth/signin')
   }
 
-  // In a real app, you'd check if the user has admin privileges
-  // For now, we'll assume all authenticated users are admins
+  // Enforce admin role via user_roles table
+  const { data: roleRow } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!roleRow || roleRow.role !== 'admin') {
+    redirect('/')
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,10 +36,10 @@ export default async function AdminLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
+              <h1 className="text-xl font-bold text-foreground">Admin Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/" className="text-gray-600 hover:text-gray-900">
+              <Link href="/" className="text-foreground/80 hover:text-foreground">
                 View Store
               </Link>
               <form action="/auth/signout" method="post">
@@ -54,7 +62,7 @@ export default async function AdminLayout({
                 <li>
                   <Link
                     href="/admin"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
                   >
                     <Package className="w-4 h-4 mr-3" />
                     Dashboard
@@ -63,7 +71,7 @@ export default async function AdminLayout({
                 <li>
                   <Link
                     href="/admin/products"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
                   >
                     <Package className="w-4 h-4 mr-3" />
                     Products
@@ -72,7 +80,7 @@ export default async function AdminLayout({
                 <li>
                   <Link
                     href="/admin/orders"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
                   >
                     <ShoppingCart className="w-4 h-4 mr-3" />
                     Orders
@@ -80,8 +88,17 @@ export default async function AdminLayout({
                 </li>
                 <li>
                   <Link
+                    href="/admin/users"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
+                  >
+                    <Users className="w-4 h-4 mr-3" />
+                    Users
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/admin/customers"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
                   >
                     <Users className="w-4 h-4 mr-3" />
                     Customers
@@ -90,7 +107,7 @@ export default async function AdminLayout({
                 <li>
                   <Link
                     href="/admin/settings"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
                   >
                     <Settings className="w-4 h-4 mr-3" />
                     Settings

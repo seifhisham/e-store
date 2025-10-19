@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
 import Image from 'next/image'
 import { Minus, Plus, Heart, Share2 } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 
 interface Product {
   id: string
@@ -95,26 +96,26 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       {/* Product Details */}
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
-          <p className="text-lg text-gray-600">{product.category}</p>
+          <h1 className="text-3xl font-bold text-black mb-2">{product.name}</h1>
+          <p className="text-lg text-black/80">{product.category}</p>
         </div>
 
         <div className="flex items-center space-x-4">
-          <span className="text-3xl font-bold text-gray-900">${price.toFixed(2)}</span>
+          <span className="text-3xl font-bold text-gray-900">{formatCurrency(price)}</span>
           {selectedVariant?.price_adjustment !== 0 && (
             <span className="text-lg text-gray-500 line-through">
-              ${product.base_price.toFixed(2)}
+              {formatCurrency(product.base_price)}
             </span>
           )}
         </div>
 
-        <p className="text-gray-700 leading-relaxed">{product.description}</p>
+        <p className="text-black leading-relaxed">{product.description}</p>
 
         {/* Variant Selection */}
         {product.variants.length > 1 && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-black mb-2">
                 Size & Color
               </label>
               <Select
@@ -141,7 +142,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
         {/* Quantity Selection */}
         <div className="space-y-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-black">
             Quantity
           </label>
           <div className="flex items-center space-x-3">
@@ -153,7 +154,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
             >
               <Minus className="w-4 h-4" />
             </Button>
-            <span className="w-12 text-center font-medium">{quantity}</span>
+            <span className="w-12 text-center font-medium text-black">{quantity}</span>
             <Button
               variant="outline"
               size="icon"
@@ -163,7 +164,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <Plus className="w-4 h-4" />
             </Button>
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-black/80">
             {selectedVariant?.stock_quantity || 0} available
           </p>
         </div>
@@ -195,15 +196,15 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
         {/* Product Details */}
         <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Product Details</h3>
-          <div className="space-y-2 text-sm text-gray-600">
+          <h3 className="text-lg font-semibold text-black mb-4">Product Details</h3>
+          <div className="space-y-2 text-sm text-black/80">
             <div className="flex justify-between">
               <span>Category:</span>
               <span className="font-medium">{product.category}</span>
             </div>
             <div className="flex justify-between">
               <span>Base Price:</span>
-              <span className="font-medium">${product.base_price.toFixed(2)}</span>
+              <span className="font-medium">{formatCurrency(product.base_price)}</span>
             </div>
             {selectedVariant && (
               <>

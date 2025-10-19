@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Plus, Edit, Trash2, Package } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 
 interface Product {
   id: string
@@ -148,9 +149,9 @@ export default function AdminProductsPage() {
               </div>
               <div className="p-4">
                 <h3 className="font-medium text-gray-900 mb-2">{product.name}</h3>
-                <p className="text-sm text-gray-600 mb-2">{product.category}</p>
+                <p className="text-sm text-gray-600 mb-2 v">{product.category}</p>
                 <p className="text-lg font-semibold text-gray-900 mb-4">
-                  ${product.base_price.toFixed(2)}
+                  {formatCurrency(product.base_price)}
                 </p>
                 <div className="flex space-x-2">
                   <Link href={`/admin/products/${product.id}/edit`} className="flex-1">
