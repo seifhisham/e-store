@@ -7,6 +7,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
+import { formatCurrency } from '@/lib/utils'
 
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, getTotalPrice, loading } = useCart()
@@ -44,8 +45,8 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your cart...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto mb-4"></div>
+          <p className="text-black">Loading your cart...</p>
         </div>
       </div>
     )
@@ -56,9 +57,9 @@ export default function CartPage() {
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
-            <ShoppingBag className="w-24 h-24 text-gray-300 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
-            <p className="text-gray-600 mb-8">Looks like you haven't added any items to your cart yet.</p>
+            <ShoppingBag className="w-24 h-24 text-black mx-auto mb-6" />
+            <h1 className="text-3xl font-bold text-black mb-4">Your cart is empty</h1>
+            <p className="text-black mb-8">Looks like you haven't added any items to your cart yet.</p>
             <Link href="/products">
               <Button size="lg">Continue Shopping</Button>
             </Link>
@@ -71,7 +72,7 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+        <h1 className="text-3xl font-bold text-black mb-8">Shopping Cart</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
@@ -98,16 +99,16 @@ export default function CartPage() {
                       
                       {/* Product Details */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-medium text-gray-900">
-                          <Link href={`/products/${item.product.id}`} className="hover:text-indigo-600">
+                        <h3 className="text-lg font-medium text-black">
+                          <Link href={`/products/${item.product.id}`} className="hover:text-primary">
                             {item.product.name}
                           </Link>
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-black">
                           {item.variant.size} - {item.variant.color}
                         </p>
-                        <p className="text-lg font-semibold text-gray-900 mt-1">
-                          ${price.toFixed(2)}
+                        <p className="text-lg font-semibold text-black mt-1">
+                          {formatCurrency(price)}
                         </p>
                       </div>
                       
@@ -115,7 +116,7 @@ export default function CartPage() {
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center border border-gray-300 rounded-md">
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
                             onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                             disabled={item.quantity <= 1 || isUpdating}
@@ -123,11 +124,11 @@ export default function CartPage() {
                           >
                             <Minus className="w-4 h-4" />
                           </Button>
-                          <span className="px-3 py-1 text-sm font-medium min-w-[3rem] text-center">
+                          <span className="px-3 py-1 text-sm text-black font-medium min-w-[3rem] text-center">
                             {item.quantity}
                           </span>
                           <Button
-                            variant="ghost"
+                            variant="destructive"
                             size="sm"
                             onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                             disabled={item.quantity >= item.variant.stock_quantity || isUpdating}
@@ -158,28 +159,28 @@ export default function CartPage() {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+              <h2 className="text-lg font-semibold text-black mb-4">Order Summary</h2>
               
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">${getTotalPrice().toFixed(2)}</span>
+                  <span className="text-black">Subtotal</span>
+                  <span className="font-medium text-black">{formatCurrency(getTotalPrice())}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">
-                    {getTotalPrice() >= 50 ? 'Free' : '$9.99'}
+                  <span className="text-black">Shipping</span>
+                  <span className="font-medium text-black">
+                    {getTotalPrice() >= 50 ? 'Free' : formatCurrency(9.99)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">${(getTotalPrice() * 0.08).toFixed(2)}</span>
+                  <span className="text-black">Tax</span>
+                  <span className="font-medium text-black">{formatCurrency(getTotalPrice() * 0.08)}</span>
                 </div>
                 <div className="border-t pt-3">
-                  <div className="flex justify-between text-lg font-semibold">
+                  <div className="flex justify-between text-lg font-semibold text-black">
                     <span>Total</span>
                     <span>
-                      ${(getTotalPrice() + (getTotalPrice() >= 50 ? 0 : 9.99) + (getTotalPrice() * 0.08)).toFixed(2)}
+                      {formatCurrency(getTotalPrice() + (getTotalPrice() >= 50 ? 0 : 9.99) + (getTotalPrice() * 0.08))}
                     </span>
                   </div>
                 </div>
@@ -192,15 +193,15 @@ export default function CartPage() {
                   </Button>
                 </Link>
                 <Link href="/products" className="block">
-                  <Button variant="outline" className="w-full">
+                  <Button variant="secondary" className="w-full text-black">
                     Continue Shopping
                   </Button>
                 </Link>
               </div>
               
               {getTotalPrice() < 50 && (
-                <p className="text-sm text-gray-500 mt-4 text-center">
-                  Add ${(50 - getTotalPrice()).toFixed(2)} more for free shipping!
+                <p className="text-sm text-black mt-4 text-center">
+                  Add {formatCurrency(Math.max(50 - getTotalPrice(), 0))} more for free shipping!
                 </p>
               )}
             </div>

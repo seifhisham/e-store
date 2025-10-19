@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/Select'
 import { getPaymob } from '@/lib/paymob'
 import { useRouter } from 'next/navigation'
 import { CreditCard, Lock } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 
 export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCart()
@@ -79,7 +80,7 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-8">Checkout</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Checkout Form */}
@@ -87,10 +88,10 @@ export default function CheckoutPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Shipping Information */}
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Shipping Information</h2>
+                <h2 className="text-lg font-semibold text-foreground mb-4">Shipping Information</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                       First Name *
                     </label>
                     <Input
@@ -101,7 +102,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                       Last Name *
                     </label>
                     <Input
@@ -114,7 +115,7 @@ export default function CheckoutPage() {
                 </div>
                 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Email *
                   </label>
                   <Input
@@ -127,7 +128,7 @@ export default function CheckoutPage() {
                 </div>
                 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Address *
                   </label>
                   <Input
@@ -140,7 +141,7 @@ export default function CheckoutPage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                       City *
                     </label>
                     <Input
@@ -151,7 +152,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                       State *
                     </label>
                     <Select
@@ -214,7 +215,7 @@ export default function CheckoutPage() {
                     </Select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-foreground mb-1">
                       ZIP Code *
                     </label>
                     <Input
@@ -232,7 +233,7 @@ export default function CheckoutPage() {
                 <Button
                   type="submit"
                   disabled={loading || items.length === 0}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700"
+                  className="w-full bg-rose-600 hover:bg-rose-700"
                   size="lg"
                 >
                   {loading ? (
@@ -240,11 +241,11 @@ export default function CheckoutPage() {
                   ) : (
                     <>
                       <CreditCard className="w-5 h-5 mr-2" />
-                      Pay ${total.toFixed(2)}
+                      Pay {formatCurrency(total)}
                     </>
                   )}
                 </Button>
-                <p className="text-xs text-gray-500 mt-2 text-center flex items-center justify-center">
+                <p className="text-xs text-foreground/80 mt-2 text-center flex items-center justify-center">
                   <Lock className="w-3 h-3 mr-1" />
                   Secure payment powered by Paymob
                 </p>
@@ -254,43 +255,43 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Order Summary</h2>
             
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">${subtotal.toFixed(2)}</span>
+                <span className="text-foreground/80">Subtotal</span>
+                <span className="font-medium">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Shipping</span>
+                <span className="text-foreground/80">Shipping</span>
                 <span className="font-medium">
-                  {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
+                  {shipping === 0 ? 'Free' : formatCurrency(shipping)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tax</span>
-                <span className="font-medium">${tax.toFixed(2)}</span>
+                <span className="text-foreground/80">Tax</span>
+                <span className="font-medium">{formatCurrency(tax)}</span>
               </div>
               <div className="border-t pt-3">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{formatCurrency(total)}</span>
                 </div>
               </div>
             </div>
 
             {/* Cart Items */}
             <div className="border-t pt-4">
-              <h3 className="font-medium text-gray-900 mb-3">Items ({items.length})</h3>
+              <h3 className="font-medium text-foreground mb-3">Items ({items.length})</h3>
               <div className="space-y-2">
                 {items.map((item) => {
                   const price = item.product.base_price + item.variant.price_adjustment
                   return (
                     <div key={item.id} className="flex justify-between text-sm">
-                      <span className="text-gray-600">
+                      <span className="text-foreground/80">
                         {item.product.name} ({item.variant.size}, {item.variant.color}) x {item.quantity}
                       </span>
-                      <span className="font-medium">${(price * item.quantity).toFixed(2)}</span>
+                      <span className="font-medium">{formatCurrency(price * item.quantity)}</span>
                     </div>
                   )
                 })}

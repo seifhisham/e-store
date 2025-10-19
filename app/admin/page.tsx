@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Package, ShoppingCart, Users, DollarSign } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -53,12 +54,12 @@ export default async function AdminDashboard() {
       name: 'Total Customers',
       value: totalCustomers || 0,
       icon: Users,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100'
+      color: 'text-black',
+      bgColor: 'bg-gray-200'
     },
     {
       name: 'Total Revenue',
-      value: `$${totalRevenue.toFixed(2)}`,
+      value: `${formatCurrency(totalRevenue)}`,
       icon: DollarSign,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-100'
@@ -68,8 +69,8 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Welcome to your admin dashboard</p>
+        <h1 className="text-2xl font-bold text-black">Dashboard</h1>
+        <p className="text-black/80">Welcome to your admin dashboard</p>
       </div>
 
       {/* Stats Grid */}
@@ -81,8 +82,8 @@ export default async function AdminDashboard() {
                 <stat.icon className={`w-6 h-6 ${stat.color}`} />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+                <p className="text-sm font-medium text-foreground/80">{stat.name}</p>
+                <p className="text-2xl font-semibold text-foreground">{stat.value}</p>
               </div>
             </div>
           </div>
@@ -92,34 +93,34 @@ export default async function AdminDashboard() {
       {/* Recent Orders */}
       <div className="bg-white rounded-lg shadow-sm border">
         <div className="px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
+          <h2 className="text-lg font-semibold text-foreground">Recent Orders</h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-foreground/50">
+            <thead className="bg-foreground/10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-foreground/80 uppercase tracking-wider">
                   Order ID
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-foreground/80 uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-foreground/80 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-foreground/80 uppercase tracking-wider">
                   Date
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-foreground/50">
               {recentOrders?.map((order) => (
                 <tr key={order.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                     {order.id.slice(0, 8)}...
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${order.total_amount.toFixed(2)}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                    {formatCurrency(order.total_amount)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -127,12 +128,12 @@ export default async function AdminDashboard() {
                         ? 'bg-green-100 text-green-800'
                         : order.status === 'pending'
                         ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-foreground/10 text-foreground'
                     }`}>
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground/80">
                     {new Date(order.created_at).toLocaleDateString()}
                   </td>
                 </tr>

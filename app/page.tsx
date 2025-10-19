@@ -23,23 +23,23 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+      <section className="bg-gradient-to-r from-rose-600 to-rose-400 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Discover Your Style
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-purple-100">
+            <p className="text-xl md:text-2xl mb-8 text-white/80">
               Shop the latest fashion trends and express your unique personality
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/products">
-                <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100">
+                <Button size="lg">
                   Shop Now
                 </Button>
               </Link>
               <Link href="/about">
-                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-purple-600">
+                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
                   Learn More
                 </Button>
               </Link>
@@ -85,42 +85,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Free Shipping</h3>
-              <p className="text-gray-600">Free shipping on orders over $50</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Quality Guarantee</h3>
-              <p className="text-gray-600">100% satisfaction guaranteed</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Easy Returns</h3>
-              <p className="text-gray-600">30-day return policy</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      
     </div>
   );
 }

@@ -43,6 +43,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
   const supabase = createClient()
 
+  const normalizeItem = (item: any): CartItem => {
+    const product = Array.isArray(item.product) ? item.product[0] : item.product
+    const variant = Array.isArray(item.variant) ? item.variant[0] : item.variant
+    return { ...item, product, variant } as CartItem
+  }
+
   const getSessionId = () => {
     if (typeof window !== 'undefined') {
       let sessionId = localStorage.getItem('cart_session_id')
@@ -68,13 +74,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             product_id,
             variant_id,
             quantity,
-            product:products(id, name, base_price),
+            product:products(id, name, base_price, images:product_images(image_url, is_primary)),
             variant:product_variants(id, size, color, price_adjustment, stock_quantity)
           `)
           .eq('user_id', user.id)
 
         if (error) throw error
-        setItems(data || [])
+        setItems((data || []).map(normalizeItem))
       } else {
         // Fetch cart items for guest user
         const sessionId = getSessionId()
@@ -86,14 +92,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               product_id,
               variant_id,
               quantity,
-              product:products(id, name, base_price),
+              product:products(id, name, base_price, images:product_images(image_url, is_primary)),
               variant:product_variants(id, size, color, price_adjustment, stock_quantity)
             `)
             .eq('session_id', sessionId)
             .is('user_id', null)
 
           if (error) throw error
-          setItems(data || [])
+          setItems((data || []).map(normalizeItem))
         }
       }
     } catch (error) {
@@ -136,15 +142,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           product_id,
           variant_id,
           quantity,
-          product:products(id, name, base_price),
+          product:products(id, name, base_price, images:product_images(image_url, is_primary)),
           variant:product_variants(id, size, color, price_adjustment, stock_quantity)
         `)
         .single()
 
       if (error) throw error
-      setItems(prev => [...prev, data])
+      const newItem = normalizeItem(data)
+      setItems(prev => [...prev, newItem])
     } catch (error) {
       console.error('Error adding to cart:', error)
+      throw error
     }
   }
 

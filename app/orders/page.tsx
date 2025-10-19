@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Package, Eye, Clock, CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
+import { formatCurrency } from '@/lib/utils'
 
 interface Order {
   id: string
@@ -148,7 +149,7 @@ export default function OrdersPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-semibold text-gray-900">
-                        ${order.total_amount.toFixed(2)}
+                        {formatCurrency(order.total_amount)}
                       </p>
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
                         {order.status}
@@ -165,7 +166,7 @@ export default function OrdersPage() {
                             {item.product.name} ({item.variant.size}, {item.variant.color}) x {item.quantity}
                           </span>
                           <span className="font-medium">
-                            ${(item.price_at_purchase * item.quantity).toFixed(2)}
+                            {formatCurrency(item.price_at_purchase * item.quantity)}
                           </span>
                         </div>
                       ))}
