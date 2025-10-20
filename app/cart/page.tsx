@@ -174,13 +174,23 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-black">Tax</span>
-                  <span className="font-medium text-black">{formatCurrency(getTotalPrice() * 0.08)}</span>
+                  <span className="font-medium text-black">{(() => {
+                    const subtotal = getTotalPrice()
+                    const shippingFee = subtotal >= 500 ? 0 : 50
+                    const tax = (subtotal + shippingFee) * 0.08
+                    return formatCurrency(tax)
+                  })()}</span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between text-lg font-semibold text-black">
                     <span>Total</span>
                     <span>
-                      {formatCurrency(getTotalPrice() + (getTotalPrice() >= 50 ? 0 : 50) + (getTotalPrice() * 0.08))}
+                      {(() => {
+                        const subtotal = getTotalPrice()
+                        const shippingFee = subtotal >= 500 ? 0 : 50
+                        const tax = (subtotal + shippingFee) * 0.08
+                        return formatCurrency(subtotal + shippingFee + tax)
+                      })()}
                     </span>
                   </div>
                 </div>

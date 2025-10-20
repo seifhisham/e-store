@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { paymob } from '@/lib/paymob'
+import { createPaymentRequest } from '@/lib/paymob-server'
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,9 +21,9 @@ export async function POST(request: NextRequest) {
       totalAmount += itemTotal
     }
 
-    // Add shipping if total is less than $50
-    if (totalAmount < 50) {
-      totalAmount += 9.99
+    // Add shipping (EGP): free if subtotal >= 500, else 50
+    if (totalAmount < 500) {
+      totalAmount += 50
     }
 
     // Add tax (8%)
@@ -61,18 +61,17 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Create Paymob checkout session
-    const checkoutData = {
-      amount_cents: Math.round(totalAmount * 100), // Convert to cents
-      currency: 'EGP', // Paymob primarily uses EGP
-      order_id: order.id,
+    // Create Paymob payment request (server-side)
+    const paymentRequest = await createPaymentRequest({
+      amountCents: Math.round(totalAmount * 100),
+      currency: 'EGP',
       items: cartItems.map((item: any) => ({
         name: item.product.name,
         amount_cents: Math.round((item.product.base_price + item.variant.price_adjustment) * 100),
         description: `${item.variant.size} - ${item.variant.color}`,
-        quantity: item.quantity
+        quantity: item.quantity,
       })),
-      shipping_data: {
+      shipping: {
         first_name: shippingAddress.firstName,
         last_name: shippingAddress.lastName,
         email: shippingAddress.email,
@@ -81,23 +80,23 @@ export async function POST(request: NextRequest) {
         city: shippingAddress.city,
         state: shippingAddress.state,
         country: shippingAddress.country || 'EG',
-        postal_code: shippingAddress.zipCode
+        postal_code: shippingAddress.zipCode,
       },
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?order_id=${order.id}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/cart`
-    }
+    })
 
-    // Create Paymob payment request
-    const paymentRequest = await paymob.createPaymentRequest(checkoutData)
-    
-    if (!paymentRequest) {
-      throw new Error('Failed to create payment request')
-    }
+    // Persist Paymob identifiers on the order
+    await supabase
+      .from('orders')
+      .update({
+        paymob_order_id: String(paymentRequest.paymob_order_id),
+        paymob_payment_token: paymentRequest.token,
+      })
+      .eq('id', order.id)
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       paymentToken: paymentRequest.token,
       orderId: order.id,
-      iframeUrl: paymentRequest.iframe_url
+      iframeUrl: paymentRequest.iframe_url,
     })
   } catch (error) {
     console.error('Checkout error:', error)

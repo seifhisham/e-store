@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/Button'
-import { Select } from '@/components/ui/Select'
+import OrderStatusSelect from '@/components/admin/OrderStatusSelect'
 import { Package, Eye, CheckCircle, XCircle } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 
@@ -99,20 +99,19 @@ export default async function AdminOrdersPage() {
                       ${order.total_amount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <form action={updateOrderStatus.bind(null, order.id)}>
-                        <Select
-                          defaultValue={order.status}
-                          name="status"
-                          onChange={(e) => e.currentTarget.form?.requestSubmit()}
-                          className="text-sm"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="processing">Processing</option>
-                          <option value="shipped">Shipped</option>
-                          <option value="completed">Completed</option>
-                          <option value="cancelled">Cancelled</option>
-                        </Select>
-                      </form>
+                      <OrderStatusSelect
+                        action={updateOrderStatus.bind(null, order.id)}
+                        defaultValue={order.status}
+                        name="status"
+                        className="text-sm"
+                        options={[
+                          { value: 'pending', label: 'Pending' },
+                          { value: 'processing', label: 'Processing' },
+                          { value: 'shipped', label: 'Shipped' },
+                          { value: 'completed', label: 'Completed' },
+                          { value: 'cancelled', label: 'Cancelled' },
+                        ]}
+                      />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(order.created_at).toLocaleDateString()}
