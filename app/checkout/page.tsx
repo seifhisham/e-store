@@ -20,12 +20,14 @@ export default function CheckoutPage() {
     firstName: '',
     lastName: '',
     email: user?.email || '',
+    phone: '',
     address: '',
     city: '',
     state: '',
     zipCode: '',
-    country: 'US'
+    country: 'EG'
   })
+  const [phoneError, setPhoneError] = useState('')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -33,6 +35,56 @@ export default function CheckoutPage() {
       ...prev,
       [name]: value
     }))
+    if (name === 'phone') {
+      setPhoneError('')
+    }
+  }
+
+  const toLatinDigits = (s: string) =>
+    s.replace(/[\u0660-\u0669\u06F0-\u06F9]/g, (ch) => {
+      const code = ch.charCodeAt(0)
+      let digit = -1
+      if (code >= 0x0660 && code <= 0x0669) digit = code - 0x0660
+      else if (code >= 0x06F0 && code <= 0x06F9) digit = code - 0x06F0
+      return String(digit)
+    })
+
+  const normalizePhone = (input: string) => {
+    let s = input.trim()
+    s = toLatinDigits(s)
+    s = s.replace(/[\u200E\u200F\u202A-\u202E]/g, '') // remove RTL marks
+    s = s.replace(/[()\s-]/g, '') // remove spaces, hyphens, parentheses
+    // Convert 00 prefix to +
+    if (s.startsWith('00')) s = '+' + s.slice(2)
+    const country = (shippingAddress.country || 'EG').toUpperCase()
+    // If user enters local style numbers, try to infer country code
+    if (!s.startsWith('+')) {
+      const digitsOnly = s.replace(/[^0-9]/g, '')
+      if (country === 'EG') {
+        // Common Egyptian formats: 01XXXXXXXXX or 1XXXXXXXXX or 20XXXXXXXXXX
+        if (digitsOnly.startsWith('0')) {
+          s = '+20' + digitsOnly.slice(1)
+        } else if (digitsOnly.startsWith('20')) {
+          s = '+' + digitsOnly
+        } else {
+          s = '+20' + digitsOnly
+        }
+      } else {
+        // As a fallback, if no + provided, keep as-is to trigger friendly error
+        s = '+' + digitsOnly
+      }
+    }
+    return s
+  }
+
+  const validatePhone = (normalized: string) => {
+    const e164 = /^\+[1-9]\d{7,14}$/
+    if (!e164.test(normalized)) {
+      setPhoneError('Enter phone with country code, e.g. +201234567890')
+      return false
+    }
+    setPhoneError('')
+    return true
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,6 +92,13 @@ export default function CheckoutPage() {
     setLoading(true)
 
     try {
+      // Normalize and validate phone in E.164 (+XXXXXXXXXXXX)
+      const normalizedPhone = normalizePhone(shippingAddress.phone)
+      if (!validatePhone(normalizedPhone)) {
+        setLoading(false)
+        return
+      }
+
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
@@ -47,7 +106,7 @@ export default function CheckoutPage() {
         },
         body: JSON.stringify({
           cartItems: items,
-          shippingAddress
+          shippingAddress: { ...shippingAddress, phone: normalizedPhone }
         })
       })
 
@@ -59,7 +118,7 @@ export default function CheckoutPage() {
         window.location.href = iframeUrl
       } else {
         // Fallback: use Paymob SDK if iframe URL is not available
-        const paymob = getPaymob()
+        const paymob = await getPaymob()
         if (paymob && paymentToken) {
           paymob.checkoutButton(paymentToken).mount('#paymob-checkout')
         }
@@ -73,7 +132,7 @@ export default function CheckoutPage() {
   }
 
   const subtotal = getTotalPrice()
-  const shipping = subtotal >= 50 ? 0 : 9.99
+  const shipping = subtotal >= 500 ? 0 : 50
   const tax = (subtotal + shipping) * 0.08
   const total = subtotal + shipping + tax
 
@@ -125,6 +184,28 @@ export default function CheckoutPage() {
                     value={shippingAddress.email}
                     onChange={handleInputChange}
                   />
+                </div>
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-foreground mb-1">
+                    Phone *
+                  </label>
+                  <Input
+                    name="phone"
+                    type="tel"
+                    required
+                    placeholder="+201xxxxxxxxx"
+                    value={shippingAddress.phone}
+                    onChange={handleInputChange}
+                    onBlur={(e) => {
+                      const normalized = normalizePhone(e.target.value)
+                      setShippingAddress(prev => ({ ...prev, phone: normalized }))
+                      validatePhone(normalized)
+                    }}
+                    className="placeholder:text-black"
+                  />
+                  {phoneError && (
+                    <p className="text-red-600 text-xs mt-1">{phoneError}</p>
+                  )}
                 </div>
                 
                 <div className="mt-4">

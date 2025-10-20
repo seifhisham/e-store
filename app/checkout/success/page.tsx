@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { CheckCircle, Package, Mail } from 'lucide-react'
@@ -9,6 +9,7 @@ import Link from 'next/link'
 
 export default function CheckoutSuccess() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const orderId = searchParams.get('order_id')
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -18,6 +19,13 @@ export default function CheckoutSuccess() {
       fetchOrderDetails()
     }
   }, [orderId])
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      router.push('/')
+    }, 4000)
+    return () => clearTimeout(t)
+  }, [router])
 
   const fetchOrderDetails = async () => {
     try {
@@ -85,7 +93,7 @@ export default function CheckoutSuccess() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total:</span>
-                  <span className="font-medium">${order.total.toFixed(2)}</span>
+                  <span className="font-medium">${order.total_amount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status:</span>
