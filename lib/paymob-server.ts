@@ -3,7 +3,7 @@
 
 const PAYMOB_BASE = process.env.PAYMOB_BASE_URL || 'https://accept.paymob.com';
 
-async function postJson<T>(path: string, body: any): Promise<T> {
+async function postJson<T, B extends Record<string, unknown>>(path: string, body: B): Promise<T> {
   const res = await fetch(`${PAYMOB_BASE}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
