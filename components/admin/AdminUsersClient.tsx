@@ -28,7 +28,7 @@ export default function AdminUsersClient() {
       if (!res.ok) throw new Error('Failed to load users')
       const data = await res.json()
       setUsers(data.users || [])
-    } catch (e) {
+    } catch {
       toast.error('Failed to load users')
     } finally {
       setLoading(false)
@@ -60,8 +60,9 @@ export default function AdminUsersClient() {
       setPassword('')
       setNewRole('user')
       await loadUsers()
-    } catch (e: any) {
-      toast.error(e?.message || 'Failed to create user')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to create user'
+      toast.error(message)
     } finally {
       setCreating(false)
     }
@@ -78,7 +79,7 @@ export default function AdminUsersClient() {
       if (!res.ok) throw new Error('Failed to update role')
       toast.success('Role updated')
       setUsers(prev => prev.map(u => u.id === id ? { ...u, role: nextRole } : u))
-    } catch (e) {
+    } catch {
       toast.error('Failed to update role')
     }
   }
