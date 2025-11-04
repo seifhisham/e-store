@@ -1,10 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Plus, Edit, Trash2, Package } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 
@@ -26,7 +26,6 @@ interface Product {
 }
 
 export default function AdminProductsPage() {
-  const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<string | null>(null)
