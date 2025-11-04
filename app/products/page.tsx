@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { ProductCard } from '@/components/ProductCard'
 import { Button } from '@/components/ui/Button'
+import Link from 'next/link'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
 import { Search, Filter } from 'lucide-react'
@@ -12,6 +13,8 @@ interface SearchParams {
   size?: string
   color?: string
   search?: string
+  page?: string
+  pageSize?: string
 }
 
 interface ProductsPageProps {
@@ -32,7 +35,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       category,
       images:product_images(image_url, is_primary),
       variants:product_variants(id, size, color, price_adjustment, stock_quantity)
-    `)
+    `, { count: 'exact' })
 
   // Apply filters
   if (searchParams.category) {
@@ -51,7 +54,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     query = query.ilike('name', `%${searchParams.search}%`)
   }
 
-  const { data: products } = await query
+  const page = Math.max(1, parseInt(searchParams.page || '1'))
+  const pageSize = Math.max(1, parseInt(searchParams.pageSize || '12'))
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  const { data: products, count } = await query.range(from, to)
+  const totalPages = Math.max(1, Math.ceil((count || 0) / pageSize))
 
   // Get unique categories for filter
   const { data: categories } = await supabase
@@ -79,6 +88,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               </h3>
 
               <form className="space-y-4">
+                <input type="hidden" name="page" value="1" />
                 {/* Search */}
                 <div>
                   <label className="block text-sm font-medium text-black mb-2">
@@ -165,13 +175,66 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   </p>
                 </div>
                 <Button
-                  onClick={() => window.location.href = '/products'}
+                  onClick={() => (typeof window !== 'undefined' ? (window.location.href = '/products') : undefined)}
                   variant="outline"
                 >
                   Clear Filters
                 </Button>
               </div>
             )}
+            {/* Pagination */}
+            <div className="flex items-center justify-between mt-8">
+              <div className="text-sm text-black">Page {page} of {totalPages}</div>
+              <div className="flex gap-2">
+                {page > 1 ? (
+                  <Link
+                    href={{
+                      pathname: '/products',
+                      query: {
+                        category: searchParams.category || undefined,
+                        minPrice: searchParams.minPrice || undefined,
+                        maxPrice: searchParams.maxPrice || undefined,
+                        size: searchParams.size || undefined,
+                        color: searchParams.color || undefined,
+                        search: searchParams.search || undefined,
+                        page: String(page - 1),
+                        pageSize: String(pageSize),
+                      },
+                    }}
+                  >
+                    <Button variant="outline">Previous</Button>
+                  </Link>
+                ) : (
+                  <Button variant="outline" disabled>
+                    Previous
+                  </Button>
+                )}
+
+                {page < totalPages ? (
+                  <Link
+                    href={{
+                      pathname: '/products',
+                      query: {
+                        category: searchParams.category || undefined,
+                        minPrice: searchParams.minPrice || undefined,
+                        maxPrice: searchParams.maxPrice || undefined,
+                        size: searchParams.size || undefined,
+                        color: searchParams.color || undefined,
+                        search: searchParams.search || undefined,
+                        page: String(page + 1),
+                        pageSize: String(pageSize),
+                      },
+                    }}
+                  >
+                    <Button variant="outline">Next</Button>
+                  </Link>
+                ) : (
+                  <Button variant="outline" disabled>
+                    Next
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
