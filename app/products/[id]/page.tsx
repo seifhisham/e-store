@@ -8,12 +8,13 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
+  const { id } = await params
   const supabase = await createClient()
   
   // Fetch product details
@@ -28,7 +29,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       images:product_images(image_url, is_primary, display_order),
       variants:product_variants(id, size, color, price_adjustment, stock_quantity)
     `)
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (error || !product) {
