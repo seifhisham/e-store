@@ -22,7 +22,7 @@ export function Navigation() {
         <div className="grid grid-cols-3 items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <h1 className="text-2xl font-bold text-white">E-Store</h1>
+            <h1 className="text-2xl font-bold text-white">Adoore</h1>
           </Link>
 
           {/* Desktop Navigation */}

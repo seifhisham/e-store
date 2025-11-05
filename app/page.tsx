@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { ProductCard } from "@/components/ProductCard";
 import { createClient } from "@/lib/supabase/server";
+import { HeroSection } from "@/components/HeroSection";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -23,30 +24,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-rose-600 to-rose-400 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Discover Your Style
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-white/80">
-              Shop the latest fashion trends and express your unique personality
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/products">
-                <Button size="lg">
-                  Shop Now
-                </Button>
-              </Link>
-              <Link href="/about">
-                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
-                  Learn More
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Featured Products */}
       <section className="py-16 bg-gray-50">
