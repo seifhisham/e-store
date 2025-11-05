@@ -12,7 +12,7 @@
   --font-mono: var(--font-geist-mono);
 
   /* High-contrast semantic tokens */
-  --color-primary: #e11d48; /* rose-600 */
+  --color-primary: #dbd8e3; /* rose-600 */
   --color-primary-foreground: #ffffff;
   --color-secondary: #f4f4f5; /* zinc-100 */
   --color-secondary-foreground: #000000; /* black */

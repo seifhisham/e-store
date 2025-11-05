@@ -198,12 +198,12 @@ export default function CartPage() {
               
               <div className="space-y-3">
                 <Link href="/checkout" className="block">
-                  <Button className="w-full" size="lg">
+                  <Button className="w-full bg-black text-white hover:bg-primary hover:text-foreground" size="lg">
                     Proceed to Checkout
                   </Button>
                 </Link>
                 <Link href="/products" className="block">
-                  <Button variant="secondary" className="w-full text-black">
+                  <Button className="w-full text-black hover:bg-foreground hover:text-white">
                     Continue Shopping
                   </Button>
                 </Link>

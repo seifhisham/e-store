@@ -242,6 +242,7 @@ export default function NewProductPage() {
                 required
                 value={formData.name}
                 onChange={handleInputChange}
+                className="placeholder:text-black"
                 placeholder="Enter product name"
               />
             </div>
@@ -277,7 +278,7 @@ export default function NewProductPage() {
               required
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:black placeholder:text-black"
               rows={3}
               placeholder="Enter product description"
             />
@@ -285,13 +286,14 @@ export default function NewProductPage() {
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Base Price ($) *
+              Base Price (EGP) *
             </label>
             <Input
               name="base_price"
               type="number"
               step="0.01"
               required
+              className="placeholder:text-black"
               value={formData.base_price}
               onChange={handleInputChange}
               placeholder="0.00"
@@ -303,7 +305,7 @@ export default function NewProductPage() {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Product Variants</h2>
-            <Button type="button" onClick={addVariant} size="sm">
+            <Button type="button" onClick={addVariant} size="sm" className="bg-black text-white hover:bg-primary hover:text-foreground">
               <Plus className="w-4 h-4 mr-2" />
               Add Variant
             </Button>
@@ -317,6 +319,7 @@ export default function NewProductPage() {
                 </label>
                 <Input
                   value={variant.size}
+                  className="placeholder:text-black"
                   onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
                   placeholder="S, M, L, XL"
                 />
@@ -328,6 +331,7 @@ export default function NewProductPage() {
                 </label>
                 <Input
                   value={variant.color}
+                  className="placeholder:text-black"
                   onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
                   placeholder="Red, Blue, etc."
                 />
@@ -339,6 +343,7 @@ export default function NewProductPage() {
                 </label>
                 <Input
                   type="number"
+                  className="placeholder:text-black"
                   value={variant.stock_quantity}
                   onChange={(e) => handleVariantChange(index, 'stock_quantity', e.target.value)}
                   placeholder="0"
@@ -352,6 +357,7 @@ export default function NewProductPage() {
                 <Input
                   type="number"
                   step="0.01"
+                  className="placeholder:text-black"
                   value={variant.price_adjustment}
                   onChange={(e) => handleVariantChange(index, 'price_adjustment', e.target.value)}
                   placeholder="0.00"
@@ -364,7 +370,7 @@ export default function NewProductPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => removeVariant(index)}
-                  className="text-red-600 hover:text-red-700"
+                  className="text-white hover:white"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -377,7 +383,7 @@ export default function NewProductPage() {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Product Images</h2>
-            <Button type="button" onClick={addImage} size="sm">
+            <Button type="button" onClick={addImage} size="sm" className="bg-black text-white hover:bg-primary hover:text-foreground">
               <Plus className="w-4 h-4 mr-2" />
               Add Image
             </Button>
@@ -405,7 +411,7 @@ export default function NewProductPage() {
                       alt={`Product image ${index + 1}`}
                       className="mx-auto h-32 w-32 object-cover rounded-lg"
                     />
-                    <div className="flex justify-center space-x-2">
+                    <div className="flex justify-center space-x-2 ">
                       <Button
                         type="button"
                         variant="outline"
@@ -483,6 +489,7 @@ export default function NewProductPage() {
           </Button>
           <Button
             type="submit"
+            className="bg-black text-white hover:bg-primary hover:text-foreground"
             disabled={loading}
           >
             {loading ? 'Creating...' : 'Create Product'}

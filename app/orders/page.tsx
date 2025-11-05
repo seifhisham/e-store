@@ -189,7 +189,7 @@ export default function OrdersPage() {
             <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
             <p className="text-gray-500 mb-6">You haven't placed any orders yet.</p>
             <Link href="/products">
-              <Button>Start Shopping</Button>
+              <Button className="bg-black text-white hover:bg-primary hover:text-foreground">Start Shopping</Button>
             </Link>
           </div>
         )}

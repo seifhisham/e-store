@@ -107,7 +107,7 @@ export default function AdminOrdersClient({ order }: AdminOrdersClientProps) {
                           {item.product?.name || 'Item'}
                           {variant ? ` (${variant})` : ''} x {item.quantity}
                         </div>
-                        <div className="font-medium">{formatCurrency(lineTotal)}</div>
+                        <div className="font-medium text-black">{formatCurrency(lineTotal)}</div>
                       </div>
                     )
                   })
@@ -128,5 +128,6 @@ export default function AdminOrdersClient({ order }: AdminOrdersClientProps) {
     </>
   )
 }
+
 
 

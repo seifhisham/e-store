@@ -17,7 +17,7 @@ export function Navigation() {
   }
 
   return (
-    <nav className="bg-rose-600 text-white shadow-sm border-b border-border">
+    <nav className="#fff text-white shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-3 items-center h-16">
           {/* Logo */}
