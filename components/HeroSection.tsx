@@ -24,10 +24,10 @@ export function HeroSection() {
             <p className="text-xl md:text-2xl mb-8 text-white/80">Shop the latest fashion trends and express your unique personality</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/products">
-                <Button size="lg">Shop Now</Button>
+                <Button size="lg" className="text-black">Shop Now</Button>
               </Link>
               <Link href="/about">
-                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">Learn More</Button>
+                <Button variant="outline" size="lg" className="text-white hover:bg-foreground hover:text-primary">Learn More</Button>
               </Link>
             </div>
           </div>

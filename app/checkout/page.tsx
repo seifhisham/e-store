@@ -140,14 +140,16 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-foreground mb-8">Checkout</h1>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Checkout Form */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Shipping Information */}
               <div>
-                <h2 className="text-lg font-semibold text-foreground mb-4">Shipping Information</h2>
+                <h2 className="text-lg font-semibold text-foreground mb-4">
+                  Shipping Information
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
@@ -172,7 +174,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                 </div>
-                
+
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-foreground mb-1">
                     Email *
@@ -197,9 +199,12 @@ export default function CheckoutPage() {
                     value={shippingAddress.phone}
                     onChange={handleInputChange}
                     onBlur={(e) => {
-                      const normalized = normalizePhone(e.target.value)
-                      setShippingAddress(prev => ({ ...prev, phone: normalized }))
-                      validatePhone(normalized)
+                      const normalized = normalizePhone(e.target.value);
+                      setShippingAddress((prev) => ({
+                        ...prev,
+                        phone: normalized,
+                      }));
+                      validatePhone(normalized);
                     }}
                     className="placeholder:text-black"
                   />
@@ -207,7 +212,7 @@ export default function CheckoutPage() {
                     <p className="text-red-600 text-xs mt-1">{phoneError}</p>
                   )}
                 </div>
-                
+
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-foreground mb-1">
                     Address *
@@ -219,7 +224,7 @@ export default function CheckoutPage() {
                     onChange={handleInputChange}
                   />
                 </div>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
@@ -242,57 +247,33 @@ export default function CheckoutPage() {
                       value={shippingAddress.state}
                       onChange={handleInputChange}
                     >
-                      <option value="">Select State</option>
-                      <option value="AL">Alabama</option>
-                      <option value="AK">Alaska</option>
-                      <option value="AZ">Arizona</option>
-                      <option value="AR">Arkansas</option>
-                      <option value="CA">California</option>
-                      <option value="CO">Colorado</option>
-                      <option value="CT">Connecticut</option>
-                      <option value="DE">Delaware</option>
-                      <option value="FL">Florida</option>
-                      <option value="GA">Georgia</option>
-                      <option value="HI">Hawaii</option>
-                      <option value="ID">Idaho</option>
-                      <option value="IL">Illinois</option>
-                      <option value="IN">Indiana</option>
-                      <option value="IA">Iowa</option>
-                      <option value="KS">Kansas</option>
-                      <option value="KY">Kentucky</option>
-                      <option value="LA">Louisiana</option>
-                      <option value="ME">Maine</option>
-                      <option value="MD">Maryland</option>
-                      <option value="MA">Massachusetts</option>
-                      <option value="MI">Michigan</option>
-                      <option value="MN">Minnesota</option>
-                      <option value="MS">Mississippi</option>
-                      <option value="MO">Missouri</option>
-                      <option value="MT">Montana</option>
-                      <option value="NE">Nebraska</option>
-                      <option value="NV">Nevada</option>
-                      <option value="NH">New Hampshire</option>
-                      <option value="NJ">New Jersey</option>
-                      <option value="NM">New Mexico</option>
-                      <option value="NY">New York</option>
-                      <option value="NC">North Carolina</option>
-                      <option value="ND">North Dakota</option>
-                      <option value="OH">Ohio</option>
-                      <option value="OK">Oklahoma</option>
-                      <option value="OR">Oregon</option>
-                      <option value="PA">Pennsylvania</option>
-                      <option value="RI">Rhode Island</option>
-                      <option value="SC">South Carolina</option>
-                      <option value="SD">South Dakota</option>
-                      <option value="TN">Tennessee</option>
-                      <option value="TX">Texas</option>
-                      <option value="UT">Utah</option>
-                      <option value="VT">Vermont</option>
-                      <option value="VA">Virginia</option>
-                      <option value="WA">Washington</option>
-                      <option value="WV">West Virginia</option>
-                      <option value="WI">Wisconsin</option>
-                      <option value="WY">Wyoming</option>
+                      <option value="">Select Governorate</option>
+                      <option value="C">Cairo</option>
+                      <option value="GZ">Giza</option>
+                      <option value="ALX">Alexandria</option>
+                      <option value="SHR">Sharqia</option>
+                      <option value="DK">Dakahlia</option>
+                      <option value="BH">Beheira</option>
+                      <option value="MNF">Monufia</option>
+                      <option value="GH">Gharbia</option>
+                      <option value="KFS">Kafr El Sheikh</option>
+                      <option value="DMN">Damietta</option>
+                      <option value="PT">Port Said</option>
+                      <option value="SUZ">Suez</option>
+                      <option value="IS">Ismailia</option>
+                      <option value="NSR">North Sinai</option>
+                      <option value="SSR">South Sinai</option>
+                      <option value="BSW">Beni Suef</option>
+                      <option value="FYM">Fayoum</option>
+                      <option value="MN">Minya</option>
+                      <option value="ASU">Asyut</option>
+                      <option value="SWG">Sohag</option>
+                      <option value="QN">Qena</option>
+                      <option value="LX">Luxor</option>
+                      <option value="ASN">Aswan</option>
+                      <option value="MT">Matrouh</option>
+                      <option value="NWB">New Valley</option>
+                      <option value="RD">Red Sea</option>
                     </Select>
                   </div>
                   <div>
@@ -314,11 +295,11 @@ export default function CheckoutPage() {
                 <Button
                   type="submit"
                   disabled={loading || items.length === 0}
-                  className="w-full bg-rose-600 hover:bg-rose-700"
+                  className="w-full bg-black text-white hover:bg-primary hover:text-foreground"
                   size="lg"
                 >
                   {loading ? (
-                    'Processing...'
+                    "Processing..."
                   ) : (
                     <>
                       <CreditCard className="w-5 h-5 mr-2" />
@@ -336,45 +317,57 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Order Summary</h2>
-            
+            <h2 className="text-lg font-semibold text-foreground mb-4">
+              Order Summary
+            </h2>
+
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-sm">
                 <span className="text-foreground/80">Subtotal</span>
-                <span className="font-medium">{formatCurrency(subtotal)}</span>
+                <span className="font-medium text-black">
+                  {formatCurrency(subtotal)}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-foreground/80">Shipping</span>
-                <span className="font-medium">
-                  {shipping === 0 ? 'Free' : formatCurrency(shipping)}
+                <span className="font-medium text-black">
+                  {shipping === 0 ? "Free" : formatCurrency(shipping)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-foreground/80">Tax</span>
-                <span className="font-medium">{formatCurrency(tax)}</span>
+                <span className="font-medium text-black">
+                  {formatCurrency(tax)}
+                </span>
               </div>
               <div className="border-t pt-3">
-                <div className="flex justify-between text-lg font-semibold">
+                <div className="flex justify-between text-lg font-semibold text-black">
                   <span>Total</span>
-                  <span>{formatCurrency(total)}</span>
+                  <span className="text-black">{formatCurrency(total)}</span>
                 </div>
               </div>
             </div>
 
             {/* Cart Items */}
             <div className="border-t pt-4">
-              <h3 className="font-medium text-foreground mb-3">Items ({items.length})</h3>
+              <h3 className="font-medium text-foreground mb-3">
+                Items ({items.length})
+              </h3>
               <div className="space-y-2">
                 {items.map((item) => {
-                  const price = item.product.base_price + item.variant.price_adjustment
+                  const price =
+                    item.product.base_price + item.variant.price_adjustment;
                   return (
                     <div key={item.id} className="flex justify-between text-sm">
                       <span className="text-foreground/80">
-                        {item.product.name} ({item.variant.size}, {item.variant.color}) x {item.quantity}
+                        {item.product.name} ({item.variant.size},{" "}
+                        {item.variant.color}) x {item.quantity}
                       </span>
-                      <span className="font-medium">{formatCurrency(price * item.quantity)}</span>
+                      <span className="font-medium text-black">
+                        {formatCurrency(price * item.quantity)}
+                      </span>
                     </div>
-                  )
+                  );
                 })}
               </div>
             </div>
@@ -382,5 +375,5 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

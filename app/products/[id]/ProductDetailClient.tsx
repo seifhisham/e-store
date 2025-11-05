@@ -174,7 +174,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
           <Button
             onClick={handleAddToCart}
             disabled={!selectedVariant || selectedVariant.stock_quantity === 0 || isAdding}
-            className="w-full"
+            className="w-full bg-black text-white hover:bg-primary hover:text-foreground"
             size="lg"
           >
             {isAdding ? 'Adding to Cart...' : 

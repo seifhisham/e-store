@@ -106,7 +106,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <Button
               onClick={handleAddToCart}
               disabled={!selectedVariant || selectedVariant.stock_quantity === 0 || isAdding}
-              className="w-full"
+              className="w-full bg-black text-white"
               size="sm"
             >
               {isAdding ? 'Adding...' : 

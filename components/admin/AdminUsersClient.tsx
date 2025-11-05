@@ -107,7 +107,7 @@ export default function AdminUsersClient() {
             <option value="user">User</option>
             <option value="admin">Admin</option>
           </Select>
-          <Button onClick={createUser} disabled={creating}>
+          <Button className="bg-black text-white hover:bg-primary hover:text-foreground" onClick={createUser} disabled={creating}>
             {creating ? 'Creating...' : 'Create User'}
           </Button>
         </div>
@@ -117,7 +117,7 @@ export default function AdminUsersClient() {
       <div className="bg-card text-card-foreground border border-border rounded-lg p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">All Users</h3>
-          <Button onClick={loadUsers} disabled={loading}>
+          <Button className="bg-black text-white hover:bg-primary hover:text-foreground" onClick={loadUsers} disabled={loading}>
             Refresh
           </Button>
         </div>
@@ -143,15 +143,15 @@ export default function AdminUsersClient() {
                     <td className="py-2 pr-4">
                       <span className={
                         u.role === 'admin'
-                          ? 'px-2 py-1 rounded bg-primary text-primary-foreground'
-                          : 'px-2 py-1 rounded bg-secondary text-secondary-foreground'
+                          ? 'px-2 py-1 rounded bg-primary text-black'
+                          : 'px-2 py-1 rounded bg-secondary text-black'
                       }>
                         {u.role}
                       </span>
                     </td>
                     <td className="py-2 pr-4">{new Date(u.created_at).toLocaleString()}</td>
                     <td className="py-2 pr-4 flex gap-2">
-                      <Button onClick={() => toggleRole(u.id, u.role)}>
+                      <Button className="bg-black text-white hover:bg-primary hover:text-foreground" onClick={() => toggleRole(u.id, u.role)}>
                         Make {u.role === 'admin' ? 'User' : 'Admin'}
                       </Button>
                       <Button
