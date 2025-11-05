@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button'
 import OrderStatusSelect from '@/components/admin/OrderStatusSelect'
 import { Package, Eye } from 'lucide-react'
 import { updateOrderStatus } from './actions'
+import AdminOrdersClient from '@/components/admin/AdminOrdersClient'
 
 export default async function AdminOrdersPage() {
   const supabase = await createClient()
@@ -99,10 +100,7 @@ export default async function AdminOrdersPage() {
                       {new Date(order.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Button variant="outline" size="sm">
-                        <Eye className="w-4 h-4 mr-1" />
-                        View
-                      </Button>
+                      <AdminOrdersClient order={order} />
                     </td>
                   </tr>
                 ))}
