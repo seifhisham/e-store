@@ -150,9 +150,26 @@ export default function AdminUsersClient() {
                       </span>
                     </td>
                     <td className="py-2 pr-4">{new Date(u.created_at).toLocaleString()}</td>
-                    <td className="py-2 pr-4">
+                    <td className="py-2 pr-4 flex gap-2">
                       <Button onClick={() => toggleRole(u.id, u.role)}>
                         Make {u.role === 'admin' ? 'User' : 'Admin'}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={async () => {
+                          const ok = window.confirm(`Remove user ${u.email}? This cannot be undone.`)
+                          if (!ok) return
+                          try {
+                            const res = await fetch(`/api/admin/users/${u.id}`, { method: 'DELETE' })
+                            if (!res.ok) throw new Error('Failed to delete user')
+                            toast.success('User removed')
+                            setUsers(prev => prev.filter(x => x.id !== u.id))
+                          } catch {
+                            toast.error('Failed to remove user')
+                          }
+                        }}
+                      >
+                        Remove
                       </Button>
                     </td>
                   </tr>
