@@ -203,7 +203,7 @@ export default function CartPage() {
                   </Button>
                 </Link>
                 <Link href="/products" className="block">
-                  <Button className="w-full text-black hover:bg-foreground hover:text-white">
+                  <Button className="w-full bg-black text-white hover:bg-primary hover:text-foreground">
                     Continue Shopping
                   </Button>
                 </Link>

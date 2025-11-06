@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import { getPaymob } from '@/lib/paymob'
 import { useRouter } from 'next/navigation'
 import { CreditCard, Lock } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
@@ -117,11 +116,7 @@ export default function CheckoutPage() {
       if (iframeUrl) {
         window.location.href = iframeUrl
       } else {
-        // Fallback: use Paymob SDK if iframe URL is not available
-        const paymob = await getPaymob()
-        if (paymob && paymentToken) {
-          paymob.checkoutButton(paymentToken).mount('#paymob-checkout')
-        }
+        throw new Error('Payment redirect unavailable')
       }
     } catch (error) {
       console.error('Checkout error:', error)
