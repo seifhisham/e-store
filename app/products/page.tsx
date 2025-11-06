@@ -148,7 +148,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                 </div>
 
 
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full bg-black text-white hover:bg-primary hover:text-foreground">
                   Apply Filters
                 </Button>
               </form>
