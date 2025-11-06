@@ -56,7 +56,7 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="group relative bg-card rounded-lg shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow">
+    <div className="group relative bg-card rounded-lg shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
       <Link href={`/products/${product.id}`}>
         <div className="aspect-square relative overflow-hidden">
           <Image
@@ -68,7 +68,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
       
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-medium text-black line-clamp-2">
             <Link href={`/products/${product.id}`} className="hover:text-black">
@@ -84,8 +84,8 @@ export function ProductCard({ product }: ProductCardProps) {
           {product.description}
         </p>
         
-        <div className="space-y-2">
-          {product.variants.length > 1 && (
+        <div className="mt-auto space-y-2">
+          {/* {product.variants.length > 1 && (
             <select
               value={selectedVariant?.id || ''}
               onChange={(e) => {
@@ -100,7 +100,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 </option>
               ))}
             </select>
-          )}
+          )} */}
 
           {hasVariants ? (
             <Button

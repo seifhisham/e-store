@@ -66,7 +66,7 @@ export function Navigation() {
                   <Button variant="ghost" size="sm">Sign In</Button>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button size="sm">Sign Up</Button>
+                  <Button size="sm" className='bg-[#3f3f46] text-white'>Sign Up</Button>
                 </Link>
               </div>
             )}

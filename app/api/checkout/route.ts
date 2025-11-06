@@ -13,13 +13,51 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     
-    // Calculate total amount
+    // Re-fetch products and variants from DB to prevent client tampering
+    const productIds = Array.from(new Set(cartItems.map((i: any) => i.product_id)))
+    const variantIds = Array.from(new Set(cartItems.map((i: any) => i.variant_id)))
+
+    const { data: products, error: productsErr } = await supabase
+      .from('products')
+      .select('id, name, base_price')
+      .in('id', productIds)
+
+    if (productsErr) throw productsErr
+
+    const { data: variants, error: variantsErr } = await supabase
+      .from('product_variants')
+      .select('id, product_id, size, color, price_adjustment, stock_quantity')
+      .in('id', variantIds)
+
+    if (variantsErr) throw variantsErr
+
+    const productMap = new Map((products || []).map(p => [p.id, p]))
+    const variantMap = new Map((variants || []).map(v => [v.id, v]))
+
+    // Calculate total from trusted DB values
     let totalAmount = 0
-    
+    const paymobItems: Array<{ name: string; amount_cents: number; description?: string; quantity: number }> = []
     for (const item of cartItems) {
-      const price = item.product.base_price + item.variant.price_adjustment
-      const itemTotal = price * item.quantity
-      totalAmount += itemTotal
+      const product = productMap.get(item.product_id)
+      const variant = variantMap.get(item.variant_id)
+      if (!product || !variant || variant.product_id !== product.id) {
+        return NextResponse.json({ error: 'Invalid cart item' }, { status: 400 })
+      }
+      if (typeof item.quantity !== 'number' || item.quantity <= 0) {
+        return NextResponse.json({ error: 'Invalid quantity' }, { status: 400 })
+      }
+      if (variant.stock_quantity != null && item.quantity > variant.stock_quantity) {
+        return NextResponse.json({ error: 'Insufficient stock' }, { status: 400 })
+      }
+
+      const unitPrice = (product.base_price || 0) + (variant.price_adjustment || 0)
+      totalAmount += unitPrice * item.quantity
+      paymobItems.push({
+        name: product.name,
+        amount_cents: Math.round(unitPrice * 100),
+        description: `${variant.size} - ${variant.color}`,
+        quantity: item.quantity,
+      })
     }
 
     // Add shipping (EGP): free if subtotal >= 500, else 50
@@ -50,15 +88,17 @@ export async function POST(request: NextRequest) {
       throw new Error('Failed to create order')
     }
 
-    // Create order items
+    // Create order items with trustworthy prices
     for (const item of cartItems) {
-      const price = item.product.base_price + item.variant.price_adjustment
+      const product = productMap.get(item.product_id)!
+      const variant = variantMap.get(item.variant_id)!
+      const unitPrice = (product.base_price || 0) + (variant.price_adjustment || 0)
       await supabase.from('order_items').insert({
         order_id: order.id,
         product_id: item.product_id,
         variant_id: item.variant_id,
         quantity: item.quantity,
-        price_at_purchase: price
+        price_at_purchase: unitPrice,
       })
     }
 
@@ -66,12 +106,7 @@ export async function POST(request: NextRequest) {
     const paymentRequest = await createPaymentRequest({
       amountCents: Math.round(totalAmount * 100),
       currency: 'EGP',
-      items: cartItems.map((item: any) => ({
-        name: item.product.name,
-        amount_cents: Math.round((item.product.base_price + item.variant.price_adjustment) * 100),
-        description: `${item.variant.size} - ${item.variant.color}`,
-        quantity: item.quantity,
-      })),
+      items: paymobItems,
       shipping: {
         first_name: shippingAddress.firstName,
         last_name: shippingAddress.lastName,

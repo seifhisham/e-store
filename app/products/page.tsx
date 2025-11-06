@@ -174,12 +174,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     Try adjusting your search or filter criteria
                   </p>
                 </div>
-                <Button
-                  onClick={() => (typeof window !== 'undefined' ? (window.location.href = '/products') : undefined)}
-                  variant="outline"
-                >
-                  Clear Filters
-                </Button>
+                <Link href="/products">
+                  <Button variant="outline">
+                    Clear Filters
+                  </Button>
+                </Link>
               </div>
             )}
             {/* Pagination */}

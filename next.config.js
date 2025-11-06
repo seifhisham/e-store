@@ -8,6 +8,7 @@ const nextConfig = {
         pathname: '/storage/**',
       },
     ],
+    qualities: [75, 85, 95],
   },
   eslint: {
     // Allow production builds to successfully complete even if there are ESLint errors

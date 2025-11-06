@@ -39,7 +39,7 @@ export default function EditProductPage() {
   })
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([])
   const [dragOver, setDragOver] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputsRef = useRef<Array<HTMLInputElement | null>>([])
 
   const [originalVariantIds, setOriginalVariantIds] = useState<string[]>([])
   const [originalImageIds, setOriginalImageIds] = useState<string[]>([])
@@ -451,7 +451,7 @@ export default function EditProductPage() {
                   <div className="space-y-4">
                     <img src={image.url} alt={`Product image ${index + 1}`} className="mx-auto h-32 w-32 object-cover rounded-lg" />
                     <div className="flex justify-center space-x-2 ">
-                      <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploadingImages[index]}>
+                      <Button type="button" variant="outline" size="sm" onClick={() => fileInputsRef.current[index]?.click()} disabled={uploadingImages[index]}>
                         <Upload className="w-4 h-4 mr-2" />
                         {uploadingImages[index] ? 'Uploading...' : 'Change Image'}
                       </Button>
@@ -465,7 +465,7 @@ export default function EditProductPage() {
                     <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
                     <div>
                       <p className="text-sm text-gray-600">Drag and drop an image here, or click to select</p>
-                      <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => fileInputRef.current?.click()} disabled={uploadingImages[index]}>
+                      <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => fileInputsRef.current[index]?.click()} disabled={uploadingImages[index]}>
                         <Upload className="w-4 h-4 mr-2" />
                         {uploadingImages[index] ? 'Uploading...' : 'Select Image'}
                       </Button>
@@ -473,7 +473,7 @@ export default function EditProductPage() {
                   </div>
                 )}
 
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileSelect(e.target.files, index)} />
+                <input ref={(el) => { fileInputsRef.current[index] = el }} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileSelect(e.target.files, index)} />
               </div>
             </div>
           ))}

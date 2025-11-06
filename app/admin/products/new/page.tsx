@@ -22,7 +22,7 @@ export default function NewProductPage() {
   })
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([])
   const [dragOver, setDragOver] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputsRef = useRef<Array<HTMLInputElement | null>>([])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -67,6 +67,7 @@ export default function NewProductPage() {
       ...prev,
       images: [...prev.images, '']
     }))
+    setUploadingImages(prev => [...prev, false])
   }
 
   const removeImage = (index: number) => {
@@ -278,7 +279,7 @@ export default function NewProductPage() {
               required
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:black placeholder:text-black"
+              className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:black placeholder:text-black"
               rows={3}
               placeholder="Enter product description"
             />
@@ -416,7 +417,7 @@ export default function NewProductPage() {
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => fileInputsRef.current[index]?.click()}
                         disabled={uploadingImages[index]}
                       >
                         <Upload className="w-4 h-4 mr-2" />
@@ -445,7 +446,7 @@ export default function NewProductPage() {
                         variant="outline"
                         size="sm"
                         className="mt-2"
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={() => fileInputsRef.current[index]?.click()}
                         disabled={uploadingImages[index]}
                       >
                         <Upload className="w-4 h-4 mr-2" />
@@ -456,23 +457,11 @@ export default function NewProductPage() {
                 )}
                 
                 <input
-                  ref={fileInputRef}
+                  ref={(el) => { fileInputsRef.current[index] = el }}
                   type="file"
                   accept="image/*"
                   className="hidden"
                   onChange={(e) => handleFileSelect(e.target.files, index)}
-                />
-              </div>
-
-              {/* URL Input as fallback */}
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Or enter image URL
-                </label>
-                <Input
-                  value={image}
-                  onChange={(e) => handleImageChange(index, e.target.value)}
-                  placeholder="https://example.com/image.jpg"
                 />
               </div>
             </div>

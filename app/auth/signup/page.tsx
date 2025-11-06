@@ -72,7 +72,7 @@ export default function SignUp() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="w-full"
+                  className="w-full placeholder:text-[#9ba6a5]"
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -90,7 +90,7 @@ export default function SignUp() {
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="new-password"
                     required
-                    className="w-full pr-20"
+                    className="w-full pr-20 placeholder:text-[#9ba6a5]"
                     placeholder="At least 6 characters"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -117,7 +117,7 @@ export default function SignUp() {
                     type={showConfirm ? 'text' : 'password'}
                     autoComplete="new-password"
                     required
-                    className="w-full pr-24"
+                    className="w-full pr-24 placeholder:text-[#9ba6a5]"
                     placeholder="Re-enter your password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -137,13 +137,13 @@ export default function SignUp() {
                 <div className="text-red-600 text-sm text-center">{error}</div>
               )}
 
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button type="submit" disabled={loading} className="w-full bg-black text-white hover:bg-primary hover:text-foreground">
                 {loading ? 'Creating account...' : 'Create account'}
               </Button>
             </form>
             <p className="text-center text-sm text-gray-600 mt-6">
               Already have an account?{' '}
-              <Link href="/auth/signin" className="text-primary hover:underline">
+              <Link href="/auth/signin" className="text-black hover:underline">
                 Sign in
               </Link>
             </p>
