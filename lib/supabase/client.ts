@@ -8,11 +8,6 @@ export function createClient() {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
     const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    console.log('Environment check:', {
-      url: url ? '✅ Found' : '❌ Missing',
-      anonKey: anonKey ? '✅ Found' : '❌ Missing'
-    })
-
     if (!url) {
       throw new Error(
         'Missing Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL is required'

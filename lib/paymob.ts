@@ -1,6 +1,8 @@
-type PaymobCtor = new (opts: { apiKey: string; clientSecret: string }) => unknown
+import type Paymob from 'paymob-pixel'
 
-export const getPaymob = async () => {
+type PaymobCtor = new (opts: { apiKey: string; clientSecret: string }) => Paymob
+
+export const getPaymob = async (): Promise<Paymob | null> => {
   if (typeof window === 'undefined') return null
   const mod = (await import('paymob-pixel')) as unknown as
     | { default: PaymobCtor }

@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
     
     // Calculate total amount
     let totalAmount = 0
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
-        user_id: null, // Will be updated after payment
+        user_id: user?.id || null,
         guest_email: shippingAddress.email,
         total_amount: totalAmount,
         status: 'pending',
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
         country: shippingAddress.country || 'EG',
         postal_code: shippingAddress.zipCode,
       },
+      merchantOrderId: String(order.id),
     })
 
     // Persist Paymob identifiers on the order

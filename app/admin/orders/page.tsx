@@ -28,7 +28,14 @@ export default async function AdminOrdersPage() {
     `)
     .order('created_at', { ascending: false })
 
-  
+  const normalizedOrders = (orders || []).map((o: any) => ({
+    ...o,
+    order_items: (o.order_items || []).map((it: any) => ({
+      ...it,
+      product: Array.isArray(it.product) ? (it.product[0] ?? null) : it.product,
+      variant: Array.isArray(it.variant) ? (it.variant[0] ?? null) : it.variant,
+    })),
+  }))
 
   return (
     <div className="space-y-6">
@@ -37,7 +44,7 @@ export default async function AdminOrdersPage() {
         <p className="text-gray-600">Manage customer orders and fulfillment</p>
       </div>
 
-      {orders && orders.length > 0 ? (
+      {normalizedOrders && normalizedOrders.length > 0 ? (
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -67,7 +74,7 @@ export default async function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {orders.map((order) => (
+                {normalizedOrders.map((order: any) => (
                   <tr key={order.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.id.slice(0, 8)}...

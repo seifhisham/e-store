@@ -10,15 +10,17 @@ import Link from 'next/link'
 export default function CheckoutSuccessClient() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const orderId = searchParams.get('order_id')
+  // Paymob can return merchant_order_id (our order id) or order_id (Paymob order id)
+  const merchantOrderId = searchParams.get('merchant_order_id') || searchParams.get('merchantOrderId')
+  const paymobOrderId = searchParams.get('order_id') || searchParams.get('paymob_order_id')
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (orderId) {
+    if (merchantOrderId || paymobOrderId) {
       fetchOrderDetails()
     }
-  }, [orderId])
+  }, [merchantOrderId, paymobOrderId])
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -46,7 +48,7 @@ export default function CheckoutSuccessClient() {
             variant:product_variants(size, color)
           )
         `)
-        .eq('id', orderId)
+        .eq(merchantOrderId ? 'id' : 'paymob_order_id', merchantOrderId ? merchantOrderId : (paymobOrderId as string))
         .single()
 
       if (error) throw error
@@ -132,6 +134,7 @@ export default function CheckoutSuccessClient() {
     </div>
   )
 }
+
 
 
 
