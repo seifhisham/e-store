@@ -17,15 +17,19 @@ type OrderItem = {
 type ShippingAddress = {
   firstName?: string
   lastName?: string
+  address?: string
   address1?: string
   address2?: string
   city?: string
   state?: string
   postalCode?: string
+  zipCode?: string
   country?: string
+  email?: string
+  phone?: string
 }
 
-type Order = {
+export type AdminOrder = {
   id: string
   total_amount: number
   status: string
@@ -36,7 +40,7 @@ type Order = {
 }
 
 interface AdminOrdersClientProps {
-  order: Order
+  order: AdminOrder
 }
 
 export default function AdminOrdersClient({ order }: AdminOrdersClientProps) {
@@ -83,14 +87,22 @@ export default function AdminOrdersClient({ order }: AdminOrdersClientProps) {
               <h4 className="font-semibold text-gray-900 mb-2">Shipping Address</h4>
               <div className="text-sm text-gray-800 space-y-0.5">
                 <div>{fullName || '—'}</div>
-                <div>{order.shipping_address?.address1 || '—'}</div>
+                <div>{order.shipping_address?.address || order.shipping_address?.address1 || '—'}</div>
                 {order.shipping_address?.address2 ? <div>{order.shipping_address.address2}</div> : null}
                 <div>
-                  {[order.shipping_address?.city, order.shipping_address?.state, order.shipping_address?.postalCode]
+                  {[order.shipping_address?.city, order.shipping_address?.state, order.shipping_address?.zipCode ?? order.shipping_address?.postalCode]
                     .filter(Boolean)
                     .join(', ') || '—'}
                 </div>
                 <div>{order.shipping_address?.country || '—'}</div>
+                {(order.shipping_address?.email || order.shipping_address?.phone) ? (
+                  <div className="text-gray-600">
+                    {order.shipping_address?.email || ''}
+                    {order.shipping_address?.phone
+                      ? `${order.shipping_address?.email ? ' • ' : ''}${order.shipping_address?.phone}`
+                      : ''}
+                  </div>
+                ) : null}
               </div>
             </div>
 

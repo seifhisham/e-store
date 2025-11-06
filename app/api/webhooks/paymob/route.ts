@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         status: orderStatus,
         updated_at: new Date().toISOString()
       })
-      .eq('id', order_id)
+      .eq('paymob_order_id', order_id)
 
     if (error) {
       console.error('Error updating order status:', error)
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       const { data: order } = await supabase
         .from('orders')
         .select('user_id')
-        .eq('id', order_id)
+        .eq('paymob_order_id', order_id)
         .single()
 
       if (order?.user_id) {

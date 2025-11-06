@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "E-Store - Fashion & Clothing",
+  title: "adoore - Fashion & Clothing",
   description: "Your one-stop destination for the latest fashion trends and quality clothing.",
 };
 

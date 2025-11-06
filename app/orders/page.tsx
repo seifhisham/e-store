@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Package, Eye, Clock, CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { formatCurrency } from '@/lib/utils'
+import Dialog, { DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/Dialog'
 
 interface Order {
   id: string
@@ -32,6 +33,8 @@ export default function OrdersPage() {
   const { user } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [open, setOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -140,7 +143,7 @@ export default function OrdersPage() {
                       {getStatusIcon(order.status)}
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900">
-                          Order #{order.id.slice(0, 8)}...
+                          Order #{order.id.slice(0, 36)}
                         </h3>
                         <p className="text-sm text-gray-500">
                           Placed on {new Date(order.created_at).toLocaleDateString()}
@@ -165,7 +168,7 @@ export default function OrdersPage() {
                           <span className="text-gray-900">
                             {item.product.name} ({item.variant.size}, {item.variant.color}) x {item.quantity}
                           </span>
-                          <span className="font-medium">
+                          <span className="font-medium text-black">
                             {formatCurrency(item.price_at_purchase * item.quantity)}
                           </span>
                         </div>
@@ -174,7 +177,14 @@ export default function OrdersPage() {
                   </div>
 
                   <div className="flex justify-end mt-4">
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedOrder(order)
+                        setOpen(true)
+                      }}
+                    >
                       <Eye className="w-4 h-4 mr-2" />
                       View Details
                     </Button>
@@ -194,6 +204,77 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-3xl">
+          {selectedOrder && (
+            <div>
+              <DialogHeader>
+                <DialogTitle>
+                  Order #{selectedOrder.id.slice(0, 8)}...
+                </DialogTitle>
+                <DialogDescription>
+                  Placed on {new Date(selectedOrder.created_at).toLocaleString()}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="mt-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedOrder.status)}`}>
+                    {selectedOrder.status}
+                  </span>
+                  <span className="text-lg font-semibold text-gray-900">
+                    {formatCurrency(selectedOrder.total_amount)}
+                  </span>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-2">Items</h4>
+                  <div className="space-y-2">
+                    {selectedOrder.order_items.map((item) => (
+                      <div key={item.id} className="flex justify-between text-sm">
+                        <span className="text-gray-900">
+                          {item.product.name} ({item.variant.size}, {item.variant.color}) x {item.quantity}
+                        </span>
+                        <span className="font-medium text-black">
+                          {formatCurrency(item.price_at_purchase * item.quantity)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-2">Shipping Address</h4>
+                  <div className="text-sm text-gray-700 space-y-1">
+                    <div>
+                      {(selectedOrder.shipping_address?.firstName || selectedOrder.shipping_address?.lastName) && (
+                        <span>
+                          {selectedOrder.shipping_address?.firstName} {selectedOrder.shipping_address?.lastName}
+                        </span>
+                      )}
+                    </div>
+                    <div>{selectedOrder.shipping_address?.address}</div>
+                    <div>
+                      {selectedOrder.shipping_address?.city}{selectedOrder.shipping_address?.state ? `, ${selectedOrder.shipping_address?.state}` : ''}
+                    </div>
+                    <div>
+                      {selectedOrder.shipping_address?.country}{selectedOrder.shipping_address?.zipCode ? `, ${selectedOrder.shipping_address?.zipCode}` : ''}
+                    </div>
+                    <div className="text-gray-600">
+                      {selectedOrder.shipping_address?.email}
+                      {selectedOrder.shipping_address?.phone ? ` • ${selectedOrder.shipping_address?.phone}` : ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <DialogClose className="px-3 py-2 rounded-md border text-sm text-black hover:bg-black hover:text-white">Close</DialogClose>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

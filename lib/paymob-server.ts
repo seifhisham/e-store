@@ -3,7 +3,7 @@
 
 const PAYMOB_BASE = process.env.PAYMOB_BASE_URL || 'https://accept.paymob.com';
 
-async function postJson<T, B extends Record<string, unknown>>(path: string, body: B): Promise<T> {
+async function postJson<T>(path: string, body: Record<string, unknown>): Promise<T> {
   const res = await fetch(`${PAYMOB_BASE}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -32,6 +32,8 @@ export interface CreatePaymentInput {
     country?: string; // ISO2
     postal_code?: string;
   };
+  // Our internal order id to get it back on redirect (via Paymob merchant_order_id)
+  merchantOrderId?: string;
 }
 
 export interface CreatePaymentResult {
@@ -66,6 +68,7 @@ export async function createPaymentRequest(input: CreatePaymentInput): Promise<C
       description: i.description || '',
       quantity: i.quantity,
     })),
+    ...(input.merchantOrderId ? { merchant_order_id: input.merchantOrderId } : {}),
   });
 
   // 3) Get payment key
