@@ -182,7 +182,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
              'Add to Cart'}
           </Button>
           
-          <div className="flex space-x-4">
+          {/* <div className="flex space-x-4">
             <Button variant="outline" className="flex-1">
               <Heart className="w-4 h-4 mr-2" />
               Wishlist
@@ -191,7 +191,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <Share2 className="w-4 h-4 mr-2" />
               Share
             </Button>
-          </div>
+          </div> */}
         </div>
 
         {/* Product Details */}
