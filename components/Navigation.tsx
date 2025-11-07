@@ -19,7 +19,7 @@ export function Navigation() {
   return (
     <nav className="#fff text-white shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-3 items-center h-16">
+        <div className="flex items-center justify-between h-16 md:grid md:grid-cols-3">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <h1 className="text-2xl font-bold text-white">Adoore</h1>
@@ -52,7 +52,7 @@ export function Navigation() {
 
             {/* Auth */}
             {user ? (
-              <div className="flex items-center space-x-2">
+              <div className="hidden sm:flex items-center space-x-2">
                 <Link href="/orders" className="p-2 text-white/90 hover:text-white">
                   <User className="h-6 w-6" />
                 </Link>
@@ -61,7 +61,7 @@ export function Navigation() {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="hidden sm:flex items-center space-x-2">
                 <Link href="/auth/signin">
                   <Button variant="ghost" size="sm">Sign In</Button>
                 </Link>
@@ -106,6 +106,43 @@ export function Navigation() {
               >
                 Contact
               </Link>
+              {user ? (
+                <>
+                  <Link
+                    href="/orders"
+                    className="block px-3 py-2 text-white/90 hover:text-white"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    My Orders
+                  </Link>
+                  <button
+                    className="block w-full text-left px-3 py-2 text-white/90 hover:text-white"
+                    onClick={async () => {
+                      await handleSignOut();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/signin"
+                    className="block px-3 py-2 text-white/90 hover:text-white"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    className="block px-3 py-2 text-white/90 hover:text-white"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

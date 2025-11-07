@@ -18,10 +18,11 @@ interface SearchParams {
 }
 
 interface ProductsPageProps {
-  searchParams: SearchParams
+  searchParams: Promise<SearchParams>
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const sp = await searchParams
   const supabase = await createClient()
 
   // Build query based on search params
@@ -38,24 +39,24 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     `, { count: 'exact' })
 
   // Apply filters
-  if (searchParams.category) {
-    query = query.eq('category', searchParams.category)
+  if (sp.category) {
+    query = query.eq('category', sp.category)
   }
 
-  if (searchParams.minPrice) {
-    query = query.gte('base_price', searchParams.minPrice)
+  if (sp.minPrice) {
+    query = query.gte('base_price', sp.minPrice)
   }
 
-  if (searchParams.maxPrice) {
-    query = query.lte('base_price', searchParams.maxPrice)
+  if (sp.maxPrice) {
+    query = query.lte('base_price', sp.maxPrice)
   }
 
-  if (searchParams.search) {
-    query = query.ilike('name', `%${searchParams.search}%`)
+  if (sp.search) {
+    query = query.ilike('name', `%${sp.search}%`)
   }
 
-  const page = Math.max(1, parseInt(searchParams.page || '1'))
-  const pageSize = Math.max(1, parseInt(searchParams.pageSize || '12'))
+  const page = Math.max(1, parseInt(sp.page || '1'))
+  const pageSize = Math.max(1, parseInt(sp.pageSize || '12'))
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
 
@@ -99,7 +100,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     <Input
                       name="search"
                       placeholder="Search products..."
-                      defaultValue={searchParams.search || ''}
+                      defaultValue={sp.search || ''}
                       className="pl-10 text-black placeholder:text-black"
                     />
                   </div>
@@ -112,7 +113,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   </label>
                   <Select
                     name="category"
-                    defaultValue={searchParams.category || ''}
+                    defaultValue={sp.category || ''}
                     className="w-full text-black"
                   >
                     <option value="">All Categories</option>
@@ -134,14 +135,14 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                       name="minPrice"
                       type="number"
                       placeholder="Min Price"
-                      defaultValue={searchParams.minPrice || ''}
+                      defaultValue={sp.minPrice || ''}
                       className="text-black placeholder:text-black"
                     />
                     <Input
                       name="maxPrice"
                       type="number"
                       placeholder="Max Price"
-                      defaultValue={searchParams.maxPrice || ''}
+                      defaultValue={sp.maxPrice || ''}
                       className="text-black placeholder:text-black"
                     />
                   </div>
@@ -190,12 +191,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     href={{
                       pathname: '/products',
                       query: {
-                        category: searchParams.category || undefined,
-                        minPrice: searchParams.minPrice || undefined,
-                        maxPrice: searchParams.maxPrice || undefined,
-                        size: searchParams.size || undefined,
-                        color: searchParams.color || undefined,
-                        search: searchParams.search || undefined,
+                        category: sp.category || undefined,
+                        minPrice: sp.minPrice || undefined,
+                        maxPrice: sp.maxPrice || undefined,
+                        size: sp.size || undefined,
+                        color: sp.color || undefined,
+                        search: sp.search || undefined,
                         page: String(page - 1),
                         pageSize: String(pageSize),
                       },
@@ -214,12 +215,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     href={{
                       pathname: '/products',
                       query: {
-                        category: searchParams.category || undefined,
-                        minPrice: searchParams.minPrice || undefined,
-                        maxPrice: searchParams.maxPrice || undefined,
-                        size: searchParams.size || undefined,
-                        color: searchParams.color || undefined,
-                        search: searchParams.search || undefined,
+                        category: sp.category || undefined,
+                        minPrice: sp.minPrice || undefined,
+                        maxPrice: sp.maxPrice || undefined,
+                        size: sp.size || undefined,
+                        color: sp.color || undefined,
+                        search: sp.search || undefined,
                         page: String(page + 1),
                         pageSize: String(pageSize),
                       },

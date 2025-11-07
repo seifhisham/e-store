@@ -48,7 +48,7 @@ export default function ContactPage() {
             <p className="text-sm text-gray-700">+20 123 456 7890</p>
           </div>
 
-          <div className="rounded-lg border bg-white p-6">
+          {/* <div className="rounded-lg border bg-white p-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center">
                 <MapPin className="w-5 h-5 text-gray-900" />
@@ -56,7 +56,7 @@ export default function ContactPage() {
               <h3 className="font-semibold text-gray-900">Address</h3>
             </div>
             <p className="text-sm text-gray-700">123 Fashion St, Cairo, EG</p>
-          </div>
+          </div> */}
 
           <div className="rounded-lg border bg-white p-6">
             <div className="flex items-center gap-3 mb-2">

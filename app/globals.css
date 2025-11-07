@@ -63,3 +63,58 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Global mobile/responsive safeguards */
+html,
+body {
+  width: 100%;
+  overflow-x: hidden; /* Prevent accidental horizontal scroll on mobile */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* Avoid overflow from padding/border calculations */
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto; /* Keep media within viewport width */
+  display: block;
+}
+
+/* Improve scroll behavior for overlays/modals on mobile */
+[role="dialog"] {
+  overscroll-behavior: contain;
+}
+
+/* Better mobile tap experience */
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent long text from causing horizontal overflow */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+li,
+span {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Ensure tap targets meet recommended size on touch devices */
+@media (pointer: coarse) {
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

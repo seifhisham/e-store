@@ -22,13 +22,6 @@ export default function CheckoutSuccessClient() {
     }
   }, [merchantOrderId, paymobOrderId])
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      router.push('/')
-    }, 4000)
-    return () => clearTimeout(t)
-  }, [router])
-
   const fetchOrderDetails = async () => {
     try {
       const supabase = createClient()
@@ -91,11 +84,11 @@ export default function CheckoutSuccessClient() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Order Number:</span>
-                  <span className="font-medium">{order.id}</span>
+                  <span className="font-medium text-black">{order.id}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total:</span>
-                  <span className="font-medium">${order.total_amount.toFixed(2)}</span>
+                  <span className="font-medium text-black">${order.total_amount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status:</span>
@@ -105,21 +98,9 @@ export default function CheckoutSuccessClient() {
             </div>
           )}
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-center text-gray-600">
-              <Package className="w-5 h-5 mr-2" />
-              <span>We'll send you a shipping confirmation email shortly</span>
-            </div>
-            
-            <div className="flex items-center justify-center text-gray-600">
-              <Mail className="w-5 h-5 mr-2" />
-              <span>Check your email for order details and tracking information</span>
-            </div>
-          </div>
-
           <div className="flex flex-col sm:flex-row gap-4 mt-8">
             <Link href="/orders" className="flex-1">
-              <Button className="w-full">
+              <Button className="w-full text-black bg-grey-800">
                 View Order History
               </Button>
             </Link>
@@ -134,10 +115,3 @@ export default function CheckoutSuccessClient() {
     </div>
   )
 }
-
-
-
-
-
-
-

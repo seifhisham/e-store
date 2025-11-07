@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+
 import { useCart } from '@/contexts/CartContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/Button'
@@ -15,6 +16,9 @@ export default function CheckoutPage() {
   const { user } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod' | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+
   const [shippingAddress, setShippingAddress] = useState({
     firstName: '',
     lastName: '',
@@ -91,6 +95,11 @@ export default function CheckoutPage() {
     setLoading(true)
 
     try {
+      if (!paymentMethod) {
+        setLoading(false)
+        alert('Please choose a payment method to continue.')
+        return
+      }
       // Normalize and validate phone in E.164 (+XXXXXXXXXXXX)
       const normalizedPhone = normalizePhone(shippingAddress.phone)
       if (!validatePhone(normalizedPhone)) {
@@ -105,14 +114,21 @@ export default function CheckoutPage() {
         },
         body: JSON.stringify({
           cartItems: items,
-          shippingAddress: { ...shippingAddress, phone: normalizedPhone }
+          shippingAddress: { ...shippingAddress, phone: normalizedPhone },
+          paymentMethod,
         })
       })
 
       const { paymentToken, orderId, iframeUrl, error } = await response.json()
       if (error) throw new Error(error)
 
-      // Redirect to Paymob payment page
+      // Handle based on payment method
+      if (paymentMethod === 'cod') {
+        if (!orderId) throw new Error('Order was not created')
+        router.push(`/checkout/success?merchant_order_id=${orderId}`)
+        return
+      }
+      // Redirect to Paymob payment page for online payments
       if (iframeUrl) {
         window.location.href = iframeUrl
       } else {
@@ -139,7 +155,7 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Checkout Form */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
               {/* Shipping Information */}
               <div>
                 <h2 className="text-lg font-semibold text-foreground mb-4">
@@ -201,7 +217,7 @@ export default function CheckoutPage() {
                       }));
                       validatePhone(normalized);
                     }}
-                    className="placeholder:text-black"
+                    className="placeholder:text-gray-400"
                   />
                   {phoneError && (
                     <p className="text-red-600 text-xs mt-1">{phoneError}</p>
@@ -285,26 +301,45 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Payment Button */}
-              <div className="pt-6 border-t">
-                <Button
-                  type="submit"
-                  disabled={loading || items.length === 0}
-                  className="w-full bg-black text-white hover:bg-primary hover:text-foreground"
-                  size="lg"
-                >
-                  {loading ? (
-                    "Processing..."
-                  ) : (
-                    <>
-                      <CreditCard className="w-5 h-5 mr-2" />
-                      Pay {formatCurrency(total)}
-                    </>
-                  )}
-                </Button>
+              {/* Payment Method */}
+              <div className="mt-6">
+                <h2 className="text-lg font-semibold text-foreground mb-2">Payment Method</h2>
+                <p className="text-sm text-foreground/70 mb-3">Choose one of the options below to place your order.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Button
+                    type="button"
+                    disabled={loading || items.length === 0}
+                    className="w-full bg-black text-white hover:bg-primary hover:text-foreground"
+                    onClick={() => {
+                      if (loading) return
+                      setPaymentMethod('online')
+                      setTimeout(() => formRef.current?.requestSubmit(), 0)
+                    }}
+                  >
+                    <CreditCard className="w-5 h-5 mr-2" />
+                    Pay Online {items.length > 0 ? `(${formatCurrency(total)})` : ''}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={loading || items.length === 0}
+                    className="w-full"
+                    onClick={() => {
+                      if (loading) return
+                      setPaymentMethod('cod')
+                      setTimeout(() => formRef.current?.requestSubmit(), 0)
+                    }}
+                  >
+                    Place Order (Cash on Delivery)
+                  </Button>
+                </div>
+              </div>
+
+              {/* Payment Footer Note */}
+              <div className="pt-4 border-t">
                 <p className="text-xs text-foreground/80 mt-2 text-center flex items-center justify-center">
                   <Lock className="w-3 h-3 mr-1" />
-                  Secure payment powered by Paymob
+                  Payments are processed securely. Online payments use Paymob.
                 </p>
               </div>
             </form>

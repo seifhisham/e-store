@@ -60,7 +60,7 @@ export function DialogContent({ className, children, ...props }: DialogContentPr
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center px-4"
       aria-modal="true"
       role="dialog"
       onMouseDown={(e) => {
@@ -72,7 +72,7 @@ export function DialogContent({ className, children, ...props }: DialogContentPr
         ref={panelRef}
         tabIndex={-1}
         className={cn(
-          'relative z-10 w-full max-w-2xl rounded-lg border bg-white p-6 shadow-lg outline-none',
+          'relative z-10 w-full max-w-2xl rounded-lg border bg-white p-4 sm:p-6 shadow-lg outline-none max-h-[85vh] overflow-y-auto',
           className
         )}
         {...props}
