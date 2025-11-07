@@ -102,11 +102,11 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
         <div className="flex items-center space-x-4">
           <span className="text-3xl font-bold text-gray-900">{formatCurrency(price)}</span>
-          {selectedVariant?.price_adjustment !== 0 && (
+          {/* {selectedVariant?.price_adjustment !== 0 && (
             <span className="text-lg text-gray-500 line-through">
               {formatCurrency(product.base_price)}
             </span>
-          )}
+          )} */}
         </div>
 
         <p className="text-black leading-relaxed">{product.description}</p>

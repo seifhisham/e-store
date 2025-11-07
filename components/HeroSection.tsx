@@ -7,7 +7,7 @@ import { HeroBackgroundSlideshow } from "@/components/HeroBackgroundSlideshow";
 export function HeroSection() {
 
   return (
-    <section className="relative text-white h-[80vh] md:h-[90vh]">
+    <section className="relative text-white h-[80svh] md:h-[90svh]">
       <div className="absolute inset-0">
         <HeroBackgroundSlideshow
           images={["/images/hero-1.jpg", "/images/hero-2.jpg", "/images/hero-3.jpg"]}

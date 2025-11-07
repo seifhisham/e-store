@@ -4,7 +4,7 @@ import { createPaymentRequest } from '@/lib/paymob-server'
 
 export async function POST(request: NextRequest) {
   try {
-    const { cartItems, shippingAddress } = await request.json()
+    const { cartItems, shippingAddress, paymentMethod } = await request.json()
     
     if (!cartItems || cartItems.length === 0) {
       return NextResponse.json({ error: 'No items in cart' }, { status: 400 })
@@ -102,7 +102,16 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Create Paymob payment request (server-side)
+    // If Cash on Delivery, skip Paymob and return orderId
+    if (paymentMethod === 'cod') {
+      // Best-effort: clear authenticated user's cart
+      if (user?.id) {
+        await supabase.from('cart_items').delete().eq('user_id', user.id)
+      }
+      return NextResponse.json({ orderId: order.id })
+    }
+
+    // Create Paymob payment request (server-side) for online payments
     const paymentRequest = await createPaymentRequest({
       amountCents: Math.round(totalAmount * 100),
       currency: 'EGP',
