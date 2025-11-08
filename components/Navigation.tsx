@@ -4,13 +4,15 @@ import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCart } from '@/contexts/CartContext'
 import { Button } from '@/components/ui/Button'
-import { ShoppingCart, User, Menu } from 'lucide-react'
+import { ShoppingCart, User, Menu, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
+import { CATEGORIES } from '@/lib/categories'
 
 export function Navigation() {
   const { user, signOut } = useAuth()
   const { getTotalItems } = useCart()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
 
   const handleSignOut = async () => {
     await signOut()
@@ -92,6 +94,31 @@ export function Navigation() {
               >
                 Products
               </Link>
+                            <button
+                type="button"
+                className="flex w-full items-center justify-between px-3 py-2 text-white/90 hover:text-white"
+                onClick={() => setIsCategoriesOpen((v) => !v)}
+              >
+                <span>Categories</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isCategoriesOpen && (
+                <div className="ml-3 space-y-1">
+                  {CATEGORIES.map((c) => (
+                    <Link
+                      key={c.value}
+                      href={{ pathname: '/products', query: { category: c.value } }}
+                      className="block px-3 py-2 text-white/90 hover:text-white"
+                      onClick={() => {
+                        setIsMenuOpen(false)
+                        setIsCategoriesOpen(false)
+                      }}
+                    >
+                      {c.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
               <Link
                 href="/about"
                 className="block px-3 py-2 text-white/90 hover:text-white"
