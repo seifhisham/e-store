@@ -176,10 +176,7 @@ Make sure to set these environment variables in your production environment:
 4. Test thoroughly
 5. Submit a pull request
 
-## License
-
-This project is licensed under the MIT License.
 
 ## Support
 
-For support, email support@estore.com or create an issue in the repository.
+For support, email aseif6952@gmail.com or create an issue in the repository.
