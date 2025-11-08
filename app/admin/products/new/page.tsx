@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { CATEGORIES } from '@/lib/categories'
 
 export default function NewProductPage() {
   const router = useRouter()
@@ -259,13 +260,11 @@ export default function NewProductPage() {
                 onChange={handleInputChange}
               >
                 <option value="">Select Category</option>
-                <option value="T-Shirts">T-Shirts</option>
-                <option value="Jeans">Jeans</option>
-                <option value="Dresses">Dresses</option>
-                <option value="Sweaters">Sweaters</option>
-                <option value="Jackets">Jackets</option>
-                <option value="Shoes">Shoes</option>
-                <option value="Accessories">Accessories</option>
+                {CATEGORIES.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
               </Select>
             </div>
           </div>

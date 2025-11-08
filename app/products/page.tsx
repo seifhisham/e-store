@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
 import { Search, Filter } from 'lucide-react'
+import { CATEGORIES } from '@/lib/categories'
 
 interface SearchParams {
   category?: string
@@ -63,13 +64,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const { data: products, count } = await query.range(from, to)
   const totalPages = Math.max(1, Math.ceil((count || 0) / pageSize))
 
-  // Get unique categories for filter
-  const { data: categories } = await supabase
-    .from('products')
-    .select('category')
-    .not('category', 'is', null)
-
-  const uniqueCategories = [...new Set(categories?.map(c => c.category) || [])]
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -117,9 +112,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     className="w-full text-black"
                   >
                     <option value="">All Categories</option>
-                    {uniqueCategories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
+                    {CATEGORIES.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.label}
                       </option>
                     ))}
                   </Select>
