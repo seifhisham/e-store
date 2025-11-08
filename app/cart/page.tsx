@@ -61,7 +61,7 @@ export default function CartPage() {
             <h1 className="text-3xl font-bold text-black mb-4">Your cart is empty</h1>
             <p className="text-black mb-8">Looks like you haven't added any items to your cart yet.</p>
             <Link href="/products">
-              <Button size="lg">Continue Shopping</Button>
+              <Button size="lg" className="w-full bg-black text-white hover:bg-primary hover:text-foreground">Continue Shopping</Button>
             </Link>
           </div>
         </div>
@@ -83,11 +83,11 @@ export default function CartPage() {
                 const price = item.product.base_price + item.variant.price_adjustment
                 
                 return (
-                  <div key={item.id} className="p-6 border-b last:border-b-0">
-                    <div className="flex items-center space-x-4">
+                  <div key={item.id} className="p-4 sm:p-6 border-b last:border-b-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                       {/* Product Image */}
-                      <div className="flex-shrink-0">
-                        <div className="w-20 h-20 relative overflow-hidden rounded-md">
+                      <div className="flex-shrink-0 self-start">
+                        <div className="w-24 h-24 sm:w-20 sm:h-20 relative overflow-hidden rounded-md">
                           <Image
                             src={item.product.images.find(img => img.is_primary)?.image_url || '/placeholder.jpg'}
                             alt={item.product.name}
@@ -99,21 +99,21 @@ export default function CartPage() {
                       
                       {/* Product Details */}
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-medium text-black">
+                        <h3 className="text-base sm:text-lg font-medium text-black break-words">
                           <Link href={`/products/${item.product.id}`} className="hover:text-primary">
                             {item.product.name}
                           </Link>
                         </h3>
-                        <p className="text-sm text-black">
+                        <p className="text-sm text-black whitespace-normal">
                           {item.variant.size} - {item.variant.color}
                         </p>
-                        <p className="text-lg font-semibold text-black mt-1">
+                        <p className="text-base sm:text-lg font-semibold text-black mt-1">
                           {formatCurrency(price)}
                         </p>
                       </div>
                       
                       {/* Quantity Controls */}
-                      <div className="flex items-center space-x-3">
+                      <div className="mt-2 sm:mt-0 flex items-center gap-3 sm:ml-auto self-start sm:self-auto">
                         <div className="flex items-center border border-gray-300 rounded-md">
                           <Button
                             variant="outline"
