@@ -6,13 +6,20 @@ import { HeroBackgroundSlideshow } from "@/components/HeroBackgroundSlideshow";
 
 export function HeroSection() {
 
+  const desktopImages = ["/images/hero-1.jpg", "/images/hero-2.jpg", "/images/hero-3.jpg"];
+  const mobileImages = ["/images/hero-mobile-1.jpg", "/images/hero-mobile-2.jpg", "/images/hero-mobile-3.jpg"];
+
   return (
     <section className="relative text-white h-[80svh] md:h-[90svh]">
-      <div className="absolute inset-0">
-        <HeroBackgroundSlideshow
-          images={["/images/hero-1.jpg", "/images/hero-2.jpg", "/images/hero-3.jpg"]}
-          intervalMs={5000}
-        />
+      {/* Small screens slideshow */}
+      <div className="absolute inset-0 md:hidden">
+        <HeroBackgroundSlideshow images={mobileImages} intervalMs={5000} />
+        <div className="absolute inset-0 bg-black/40" />
+      </div>
+
+      {/* Desktop and up slideshow */}
+      <div className="absolute inset-0 hidden md:block">
+        <HeroBackgroundSlideshow images={desktopImages} intervalMs={5000} />
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
