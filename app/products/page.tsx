@@ -2,10 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { ProductCard } from '@/components/ProductCard'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
-import { Select } from '@/components/ui/Select'
-import { Input } from '@/components/ui/Input'
-import { Search, Filter } from 'lucide-react'
-import { CATEGORIES } from '@/lib/categories'
+import { Search } from 'lucide-react'
+import { ProductsToolbar } from '@/components/ProductsToolbar'
+
 
 interface SearchParams {
   category?: string
@@ -16,6 +15,9 @@ interface SearchParams {
   search?: string
   page?: string
   pageSize?: string
+  availability?: string
+  priceRange?: string
+  sort?: string
 }
 
 interface ProductsPageProps {
@@ -44,6 +46,21 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     query = query.eq('category', sp.category)
   }
 
+  // Map priceRange -> min/max if provided
+  if (sp.priceRange) {
+    const map: Record<string, { min?: number; max?: number }> = {
+      '0-500': { min: 0, max: 500 },
+      '500-1000': { min: 500, max: 1000 },
+      '1000-2000': { min: 1000, max: 2000 },
+      '2000+': { min: 2000 },
+    }
+    const r = map[sp.priceRange]
+    if (r) {
+      if (typeof r.min === 'number') query = query.gte('base_price', r.min)
+      if (typeof r.max === 'number') query = query.lte('base_price', r.max)
+    }
+  }
+
   if (sp.minPrice) {
     query = query.gte('base_price', sp.minPrice)
   }
@@ -54,6 +71,54 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   if (sp.search) {
     query = query.ilike('name', `%${sp.search}%`)
+  }
+
+  // Availability: in_stock => product ids with any variant stock_quantity > 0
+  if (sp.availability === 'in_stock') {
+    const { data: idsRows } = await supabase
+      .from('product_variants')
+      .select('product_id')
+      .gt('stock_quantity', 0)
+    const ids = Array.from(new Set((idsRows || []).map(r => r.product_id).filter(Boolean)))
+    if (ids.length === 0) {
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <ProductsToolbar initial={sp} count={0} />
+            <div className="text-center py-12">
+              <Search className="w-16 h-16 mx-auto mb-4 text-black" />
+              <h3 className="text-lg font-medium text-black mb-2">No products found</h3>
+              <p className="text-black">Try adjusting your filter criteria</p>
+              <div className="mt-4">
+                <Link href="/products">
+                  <Button variant="outline">Clear Filters</Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    query = query.in('id', ids as string[])
+  }
+
+  // Sorting
+  switch (sp.sort) {
+    case 'name_asc':
+      query = query.order('name', { ascending: true })
+      break
+    case 'name_desc':
+      query = query.order('name', { ascending: false })
+      break
+    case 'price_asc':
+      query = query.order('base_price', { ascending: true })
+      break
+    case 'price_desc':
+      query = query.order('base_price', { ascending: false })
+      break
+    default:
+      // Default sort: newest first (created_at not selected here; falls back to name asc)
+      query = query.order('name', { ascending: true })
   }
 
   const page = Math.max(1, parseInt(sp.page || '1'))
@@ -67,94 +132,19 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-black mb-4">All Products</h1>
-          <p className="text-black">Discover our complete collection</p>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-black mb-2">Products</h1>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar */}
-          <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-black mb-4 flex items-center">
-                <Filter className="w-5 h-5 mr-2" />
-                Filters
-              </h3>
+        {/* Top toolbar */}
+        <ProductsToolbar initial={sp} count={count || 0} />
 
-              <form className="space-y-4">
-                <input type="hidden" name="page" value="1" />
-                {/* Search */}
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">
-                    Search
-                  </label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-4 h-4" />
-                    <Input
-                      name="search"
-                      placeholder="Search products..."
-                      defaultValue={sp.search || ''}
-                      className="pl-10 text-black placeholder:text-black"
-                    />
-                  </div>
-                </div>
-
-                {/* Category */}
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">
-                    Category
-                  </label>
-                  <Select
-                    name="category"
-                    defaultValue={sp.category || ''}
-                    className="w-full text-black"
-                  >
-                    <option value="">All Categories</option>
-                    {CATEGORIES.map((c) => (
-                      <option key={c.value} value={c.value}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-
-                {/* Price Range */}
-                <div className="text-black">
-                  <label className="block text-sm font-medium mb-2">
-                    Price Range
-                  </label>
-                  <div className="space-y-2">
-                    <Input
-                      name="minPrice"
-                      type="number"
-                      placeholder="Min Price"
-                      defaultValue={sp.minPrice || ''}
-                      className="text-black placeholder:text-black"
-                    />
-                    <Input
-                      name="maxPrice"
-                      type="number"
-                      placeholder="Max Price"
-                      defaultValue={sp.maxPrice || ''}
-                      className="text-black placeholder:text-black"
-                    />
-                  </div>
-                </div>
-
-
-                <Button type="submit" className="w-full bg-black text-white hover:bg-primary hover:text-foreground">
-                  Apply Filters
-                </Button>
-              </form>
-            </div>
-          </div>
-
-          {/* Products Grid */}
-          <div className="flex-1">
+        {/* Products Grid */}
+        <div className="mt-6">
             {products && products.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -178,59 +168,62 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               </div>
             )}
             {/* Pagination */}
-            <div className="flex items-center justify-between mt-8">
-              <div className="text-sm text-black">Page {page} of {totalPages}</div>
-              <div className="flex gap-2">
-                {page > 1 ? (
+            <nav className="flex items-center justify-end mt-8 gap-6 select-none">
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                .map((p) => (
                   <Link
+                    key={p}
                     href={{
                       pathname: '/products',
                       query: {
                         category: sp.category || undefined,
                         minPrice: sp.minPrice || undefined,
                         maxPrice: sp.maxPrice || undefined,
+                        priceRange: sp.priceRange || undefined,
+                        availability: sp.availability || undefined,
+                        sort: sp.sort || undefined,
                         size: sp.size || undefined,
                         color: sp.color || undefined,
                         search: sp.search || undefined,
-                        page: String(page - 1),
+                        page: String(p),
                         pageSize: String(pageSize),
                       },
                     }}
+                    aria-current={page === p ? 'page' : undefined}
                   >
-                    <Button variant="outline">Previous</Button>
+                    <span className={`inline-block text-sm text-neutral-900 ${
+                      page === p ? 'border-b border-neutral-900 pb-1' : 'hover:text-neutral-950'
+                    }`}>
+                      {p}
+                    </span>
                   </Link>
-                ) : (
-                  <Button variant="outline" disabled>
-                    Previous
-                  </Button>
-                )}
+                ))}
 
-                {page < totalPages ? (
-                  <Link
-                    href={{
-                      pathname: '/products',
-                      query: {
-                        category: sp.category || undefined,
-                        minPrice: sp.minPrice || undefined,
-                        maxPrice: sp.maxPrice || undefined,
-                        size: sp.size || undefined,
-                        color: sp.color || undefined,
-                        search: sp.search || undefined,
-                        page: String(page + 1),
-                        pageSize: String(pageSize),
-                      },
-                    }}
-                  >
-                    <Button variant="outline">Next</Button>
-                  </Link>
-                ) : (
-                  <Button variant="outline" disabled>
-                    Next
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
+              {page < totalPages && (
+                <Link
+                  href={{
+                    pathname: '/products',
+                    query: {
+                      category: sp.category || undefined,
+                      minPrice: sp.minPrice || undefined,
+                      maxPrice: sp.maxPrice || undefined,
+                      priceRange: sp.priceRange || undefined,
+                      availability: sp.availability || undefined,
+                      sort: sp.sort || undefined,
+                      size: sp.size || undefined,
+                      color: sp.color || undefined,
+                      search: sp.search || undefined,
+                      page: String(page + 1),
+                      pageSize: String(pageSize),
+                    },
+                  }}
+                  aria-label="Next page"
+                >
+                  <span className="inline-block text-neutral-900">›</span>
+                </Link>
+              )}
+            </nav>
         </div>
       </div>
     </div>
