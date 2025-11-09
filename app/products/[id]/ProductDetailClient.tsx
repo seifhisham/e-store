@@ -164,9 +164,6 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
               <Plus className="w-4 h-4" />
             </Button>
           </div>
-          <p className="text-sm text-black/80">
-            {selectedVariant?.stock_quantity || 0} available
-          </p>
         </div>
 
         {/* Action Buttons */}

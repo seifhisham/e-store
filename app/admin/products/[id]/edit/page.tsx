@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { CATEGORIES } from '@/lib/categories'
 
 type VariantForm = {
   id?: string
@@ -325,13 +326,11 @@ export default function EditProductPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
               <Select name="category" required value={formData.category} onChange={handleInputChange}>
                 <option value="">Select Category</option>
-                <option value="T-Shirts">T-Shirts</option>
-                <option value="Jeans">Jeans</option>
-                <option value="Dresses">Dresses</option>
-                <option value="Sweaters">Sweaters</option>
-                <option value="Jackets">Jackets</option>
-                <option value="Shoes">Shoes</option>
-                <option value="Accessories">Accessories</option>
+                {CATEGORIES.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
               </Select>
             </div>
           </div>
