@@ -143,9 +143,8 @@ export default function CheckoutPage() {
   }
 
   const subtotal = getTotalPrice()
-  const shipping = subtotal >= 500 ? 0 : 50
-  const tax = (subtotal + shipping) * 0.08
-  const total = subtotal + shipping + tax
+  const shipping = 100
+  const total = subtotal + shipping
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -306,7 +305,7 @@ export default function CheckoutPage() {
                 <h2 className="text-lg font-semibold text-foreground mb-2">Payment Method</h2>
                 <p className="text-sm text-foreground/70 mb-3">Choose one of the options below to place your order.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Button
+                  {/* <Button
                     type="button"
                     disabled={loading || items.length === 0}
                     className="w-full bg-black text-white hover:bg-primary hover:text-foreground"
@@ -318,7 +317,7 @@ export default function CheckoutPage() {
                   >
                     <CreditCard className="w-5 h-5 mr-2" />
                     Pay Online {items.length > 0 ? `(${formatCurrency(total)})` : ''}
-                  </Button>
+                  </Button> */}
                   <Button
                     type="button"
                     variant="outline"
@@ -361,13 +360,7 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-sm">
                 <span className="text-foreground/80">Shipping</span>
                 <span className="font-medium text-black">
-                  {shipping === 0 ? "Free" : formatCurrency(shipping)}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-foreground/80">Tax</span>
-                <span className="font-medium text-black">
-                  {formatCurrency(tax)}
+                  {formatCurrency(shipping)}
                 </span>
               </div>
               <div className="border-t pt-3">

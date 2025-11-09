@@ -12,6 +12,7 @@ import { formatCurrency } from '@/lib/utils'
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, getTotalPrice, loading } = useCart()
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
+  const shipping = 100
 
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return
@@ -168,18 +169,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-black">Shipping</span>
-                  <span className="font-medium text-black">
-                    {getTotalPrice() >= 500 ? 'Free' : formatCurrency(50)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-black">Tax</span>
-                  <span className="font-medium text-black">{(() => {
-                    const subtotal = getTotalPrice()
-                    const shippingFee = subtotal >= 500 ? 0 : 50
-                    const tax = (subtotal + shippingFee) * 0.08
-                    return formatCurrency(tax)
-                  })()}</span>
+                  <span className="font-medium text-black">{formatCurrency(shipping)}</span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between text-lg font-semibold text-black">
@@ -187,9 +177,7 @@ export default function CartPage() {
                     <span>
                       {(() => {
                         const subtotal = getTotalPrice()
-                        const shippingFee = subtotal >= 500 ? 0 : 50
-                        const tax = (subtotal + shippingFee) * 0.08
-                        return formatCurrency(subtotal + shippingFee + tax)
+                        return formatCurrency(subtotal + shipping)
                       })()}
                     </span>
                   </div>
@@ -209,11 +197,7 @@ export default function CartPage() {
                 </Link>
               </div>
               
-              {getTotalPrice() < 500 && (
-                <p className="text-sm text-black mt-4 text-center">
-                  Add {formatCurrency(Math.max(500 - getTotalPrice(), 0))} more for free shipping!
-                </p>
-              )}
+
             </div>
           </div>
         </div>
