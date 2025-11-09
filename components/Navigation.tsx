@@ -24,7 +24,9 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16 md:grid md:grid-cols-3">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <h1 className="text-2xl font-bold text-white">Adoore</h1>
+            <h1 className="text-2xl text-white"
+            style={{ fontFamily: "'Adore Modern Serif', serif" }}
+            >ADOORE</h1>
           </Link>
 
           {/* Desktop Navigation */}

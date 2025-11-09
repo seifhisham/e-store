@@ -198,12 +198,13 @@ export default function EditProductPage() {
     try {
       const supabase = createClient()
 
+      const roundedBase = Math.round((parseFloat(formData.base_price || '0')) * 100) / 100
       const { error: updateError } = await supabase
         .from('products')
         .update({
           name: formData.name,
           description: formData.description,
-          base_price: parseFloat(formData.base_price || '0'),
+          base_price: roundedBase,
           category: formData.category,
         })
         .eq('id', productId)
@@ -226,7 +227,7 @@ export default function EditProductPage() {
           size: v.size,
           color: v.color,
           stock_quantity: parseInt(v.stock_quantity || '0'),
-          price_adjustment: parseFloat(v.price_adjustment || '0'),
+          price_adjustment: Math.round(((parseFloat(v.price_adjustment || '0')) * 100)) / 100,
         }
         if (v.id) {
           const { error } = await supabase.from('product_variants').update(payload).eq('id', v.id)

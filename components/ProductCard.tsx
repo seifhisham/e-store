@@ -26,9 +26,11 @@ interface Product {
 
 interface ProductCardProps {
   product: Product
+  isNew?: boolean
+  showActions?: boolean
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, isNew, showActions = true }: ProductCardProps) {
   const { addToCart } = useCart()
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0])
   const [isAdding, setIsAdding] = useState(false)
@@ -56,34 +58,38 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="group relative bg-card rounded-lg shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
-      <Link href={`/products/${product.id}`}>
-        <div className="aspect-square relative overflow-hidden">
+    <article className="group relative bg-card rounded-lg shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
+      <Link href={`/products/${product.id}`} aria-label={`View details for ${product.name}`}>
+        <div className="aspect-[3/4] relative overflow-hidden bg-neutral-100">
+          {isNew && (
+            <span className="absolute left-2 top-2 z-10 rounded-full bg-red-500 px-2 py-1 text-xs font-medium text-white" aria-label="New product">
+              New
+            </span>
+          )}
           <Image
             src={primaryImage?.image_url || '/placeholder.jpg'}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
+            loading="lazy"
+            sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           />
         </div>
       </Link>
       
       <div className="p-4 flex flex-col flex-1">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="font-medium text-black line-clamp-2">
-            <Link href={`/products/${product.id}`} className="hover:text-black">
+        <div className="mb-2">
+          <h3 className="font-semibold text-black line-clamp-2">
+            <Link href={`/products/${product.id}`} className="hover:text-black" aria-label={`View details for ${product.name}`}>
               {product.name}
             </Link>
           </h3>
-          <span className="text-lg font-semibold text-black">
+          <span className="mt-1 block text-base font-medium text-black">
             {formatCurrency(price)}
           </span>
         </div>
         
-        <p className="text-sm text-black mb-3 line-clamp-2">
-          {product.description}
-        </p>
-        
+        {showActions && (
         <div className="mt-auto space-y-2">
           {/* {product.variants.length > 1 && (
             <select
@@ -108,6 +114,7 @@ export function ProductCard({ product }: ProductCardProps) {
               disabled={!selectedVariant || selectedVariant.stock_quantity === 0 || isAdding}
               className="w-full bg-black text-white hover:bg-primary hover:text-foreground"
               size="sm"
+              aria-label={`Add ${product.name} to cart`}
             >
               {isAdding ? 'Adding...' : 
                selectedVariant?.stock_quantity === 0 ? 'Out of Stock' : 
@@ -115,13 +122,14 @@ export function ProductCard({ product }: ProductCardProps) {
             </Button>
           ) : (
             <Link href={`/products/${product.id}`}>
-              <Button className="w-full" size="sm" variant="outline">
+              <Button className="w-full" size="sm" variant="outline" aria-label={`View details for ${product.name}`}>
                 View Details
               </Button>
             </Link>
           )}
         </div>
+        )}
       </div>
-    </div>
+    </article>
   )
 }
