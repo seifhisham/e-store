@@ -8,9 +8,9 @@ export function HeroSection() {
 
   const desktopImages = ["/images/hero-1.jpg", "/images/hero-2.jpg", "/images/hero-3.jpg"];
   const mobileImages = [
-    "https://oyrfzypkbrotgotrqttf.supabase.co/storage/v1/object/public/hero/hero-mobile-1.jpg",
-    "https://oyrfzypkbrotgotrqttf.supabase.co/storage/v1/object/public/hero/hero-mobile-2.jpg",
-    "https://oyrfzypkbrotgotrqttf.supabase.co/storage/v1/object/public/hero/hero-mobile-3.jpg",
+    "https://oyrfzypkbrotgotrqttf.supabase.co/storage/v1/object/public/hero/hero-mobile-1.JPG",
+    "https://oyrfzypkbrotgotrqttf.supabase.co/storage/v1/object/public/hero/hero-mobile-2.JPG",
+    "https://oyrfzypkbrotgotrqttf.supabase.co/storage/v1/object/public/hero/hero-mobile-3.JPG",
   ];
 
   return (
