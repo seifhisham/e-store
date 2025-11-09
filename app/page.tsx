@@ -1,107 +1,86 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
 import { ProductCard } from "@/components/ProductCard";
+import { NewCollectionBanner } from "@/components/NewCollectionBanner";
 import { createClient } from "@/lib/supabase/server";
 import { HeroSection } from "@/components/HeroSection";
 import { CATEGORIES } from "@/lib/categories";
 
 export default async function Home() {
   const supabase = await createClient();
-  
-  // Fetch featured products
-  const { data: products } = await supabase
-    .from('products')
-    .select(`
-      id,
-      name,
-      description,
-      base_price,
-      category,
-      images:product_images(image_url, is_primary),
-      variants:product_variants(id, size, color, price_adjustment, stock_quantity)
-    `)
-    .limit(8);
+  // Fetch up to 4 latest products per category
+  const sections = await Promise.all(
+    CATEGORIES.map(async (cat) => {
+      const { data } = await supabase
+        .from('products')
+        .select(`
+          id,
+          name,
+          description,
+          base_price,
+          category,
+          created_at,
+          images:product_images(image_url, is_primary),
+          variants:product_variants(id, size, color, price_adjustment, stock_quantity)
+        `)
+        .eq('category', cat.value)
+        .order('created_at', { ascending: false })
+        .limit(4);
 
-  
+      return { category: cat, products: data || [] };
+    })
+  );
+
+  const now = Date.now();
+  const isNew = (created_at?: string | null) => {
+    if (!created_at) return false;
+    const created = new Date(created_at).getTime();
+    const fourteenDays = 14 * 24 * 60 * 60 * 1000;
+    return now - created < fourteenDays;
+  };
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <HeroSection />
+      <NewCollectionBanner />
 
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Shop by Category</h2>
-            <p className="text-lg text-gray-600">Find your perfect style from our curated collections.</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {CATEGORIES.map((c) => (
-              <Link
-                key={c.value}
-                href={{ pathname: '/products', query: { category: c.value } }}
-                aria-label={`Shop ${c.label}`}
-                className="group block"
-              >
-                <div className="relative overflow-hidden rounded-lg border bg-white transition-shadow duration-300 group-hover:shadow-md">
-                  <div className="relative aspect-[4/3] w-full">
-                    <img
-                      src={c.image}
-                      alt={c.label}
-                      className="absolute inset-0 block h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/20 transition-colors duration-300 group-hover:bg-black/30" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="inline-flex rounded-md bg-black/60 px-3 py-1 text-sm font-medium text-white">
-                        {c.label}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+      {/* Category Sections */}
+      <div className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {sections.map(({ category, products }) => (
+            products.length === 0 ? null : (
+            <section
+              key={category.value}
+              className="mt-10"
+              aria-labelledby={`heading-${category.value}`}
+            >
+              <h2 id={`heading-${category.value}`} className="text-2xl font-bold text-gray-900">
+                {category.label}
+              </h2>
+              <div className="mt-5 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {products.map((p: any) => (
+                  <ProductCard key={p.id} product={p} isNew={isNew(p.created_at)} showActions={false} />
+                ))}
+              </div>
+              <div className="mt-6 flex justify-center">
+                <Link
+                  href={{ pathname: '/products', query: { category: category.value } }}
+                  aria-label={`View all products in ${category.label}`}
+                  className="inline-block group text-center"
+                >
+                  <span className="block text-xs uppercase tracking-[0.15em] text-black font-medium">
+                    View All {category.label}
+                  </span>
+                  <span
+                    className="block h-px bg-black mt-1 transition-colors duration-200 group-hover:bg-neutral-800"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </div>
+            </section>
+          ))) }
         </div>
-      </section>
-
-      {/* Featured Products */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Featured Products
-            </h2>
-            <p className="text-lg text-gray-600">
-              Discover our most popular items
-            </p>
-          </div>
-          
-          {products && products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">No products available yet.</p>
-              <Link href="/admin/products">
-                <Button>Add Products</Button>
-              </Link>
-            </div>
-          )}
-          
-          <div className="text-center mt-12">
-            <Link href="/products">
-              <Button variant="outline" size="lg">
-                View All Products
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      
+      </div>
     </div>
   );
 }

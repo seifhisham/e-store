@@ -6,6 +6,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import ToasterClient from "@/components/ToasterClient";
+import { Analytics } from '@vercel/analytics/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,7 @@ export default function RootLayout({
           </CartProvider>
         </AuthProvider>
         <ToasterClient />
+        <Analytics />
       </body>
     </html>
   );

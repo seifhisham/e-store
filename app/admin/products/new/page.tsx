@@ -140,10 +140,12 @@ export default function NewProductPage() {
     try {
       const supabase = createClient()
 
+      const basePrice = Math.round((parseFloat(formData.base_price || '0')) * 100) / 100
+
       console.log('Creating product with data:', {
         name: formData.name,
         description: formData.description,
-        base_price: parseFloat(formData.base_price),
+        base_price: basePrice,
         category: formData.category
       })
 
@@ -153,7 +155,7 @@ export default function NewProductPage() {
         .insert({
           name: formData.name,
           description: formData.description,
-          base_price: parseFloat(formData.base_price),
+          base_price: basePrice,
           category: formData.category
         })
         .select()
@@ -175,7 +177,7 @@ export default function NewProductPage() {
             size: variant.size,
             color: variant.color,
             stock_quantity: parseInt(variant.stock_quantity) || 0,
-            price_adjustment: parseFloat(variant.price_adjustment) || 0
+            price_adjustment: Math.round(((parseFloat(variant.price_adjustment) || 0) * 100)) / 100
           })
           
           if (variantError) {
