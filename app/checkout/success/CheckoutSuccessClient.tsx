@@ -88,7 +88,7 @@ export default function CheckoutSuccessClient() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total:</span>
-                  <span className="font-medium text-black">${order.total_amount.toFixed(2)}</span>
+                  <span className="font-medium text-black">EGB{order.total_amount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status:</span>
