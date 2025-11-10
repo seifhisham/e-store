@@ -60,14 +60,8 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Add shipping (EGP): free if subtotal >= 500, else 50
-    if (totalAmount < 500) {
-      totalAmount += 50
-    }
-
-    // Add tax (8%)
-    const tax = totalAmount * 0.08
-    totalAmount += tax
+    // Add flat shipping (EGP)
+    totalAmount += 100
 
     // Create order in database first
     const { data: order, error: orderError } = await supabase
