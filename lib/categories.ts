@@ -12,14 +12,14 @@ export const CATEGORIES: CategoryItem[] = [
       'https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?q=80&w=1600&h=1200&auto=format&fit=crop',
   },
   {
-    value: 'Knitwear',
-    label: 'Knitwear',
+    value: 'KnitWear',
+    label: 'KnitWear',
     image:
       'https://images.unsplash.com/photo-1560243563-062bfc001d68?q=80&w=1600&h=1200&auto=format&fit=crop',
   },
   {
-    value: 'cardigan',
-    label: 'cardigan',
+    value: 'Cardigan',
+    label: 'Cardigan',
     image:
       'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=1600&h=1200&auto=format&fit=crop',
   },
@@ -34,11 +34,17 @@ export const CATEGORIES: CategoryItem[] = [
     label: 'Jackets',
     image:
       'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1600&h=1200&auto=format&fit=crop',
-  }, 
+  },
   {
-    value: 'Sweatpants',
-    label: 'Sweatpants',
+    value: 'Coats',
+    label: 'Coats',
     image:
       'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=1600&h=1200&auto=format&fit=crop',
-  },    
+  },  
+  {
+    value: 'SweatPants',
+    label: 'SweatPants',
+    image:
+      'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=1600&h=1200&auto=format&fit=crop',
+  }, 
 ]
