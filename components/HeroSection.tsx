@@ -9,6 +9,7 @@ export function HeroSection() {
   const desktopImages = ["/images/hero-1.jpg", "/images/hero-2.jpg", "/images/hero-3.jpg"];
   const mobileImages = ["/images/mobile-1.jpg", "/images/mobile-2.JPG", "/images/mobile-3.jpg","/images/mobile-4.jpg"];
 
+
   return (
     <section className="relative text-white h-[80svh] md:h-[90svh]">
       {/* Small screens slideshow */}
