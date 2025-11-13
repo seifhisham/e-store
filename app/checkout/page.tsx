@@ -143,7 +143,7 @@ export default function CheckoutPage() {
   }
 
   const subtotal = getTotalPrice()
-  const shipping = 100
+  const shipping = 80
   const total = subtotal + shipping
 
   return (
