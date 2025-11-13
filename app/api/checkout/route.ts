@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Add flat shipping (EGP)
-    totalAmount += 100
+    totalAmount += 80
 
     // Create order in database first
     const { data: order, error: orderError } = await supabase
