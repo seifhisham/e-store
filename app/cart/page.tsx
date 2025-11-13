@@ -12,7 +12,7 @@ import { formatCurrency } from '@/lib/utils'
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, getTotalPrice, loading } = useCart()
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
-  const shipping = 100
+  const shipping = 80
 
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return
