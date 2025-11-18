@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/Button'
 import OrderStatusSelect from '@/components/admin/OrderStatusSelect'
 import { Package, Eye } from 'lucide-react'
 import { updateOrderStatus } from './actions'

@@ -34,6 +34,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState(1)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isAdding, setIsAdding] = useState(false)
+  const [mainAspectRatio, setMainAspectRatio] = useState<string | null>(null)
 
   const sortedImages = [...product.images].sort((a, b) => a.display_order - b.display_order)
   const price = product.base_price + (selectedVariant?.price_adjustment || 0)
@@ -60,12 +61,22 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       {/* Product Images */}
       <div className="space-y-4">
         {/* Main Image */}
-        <div className="aspect-square relative overflow-hidden rounded-lg">
+        <div
+          className="relative overflow-hidden rounded-lg"
+          style={{ aspectRatio: mainAspectRatio || '1 / 1' }}
+        >
           <Image
             src={sortedImages[selectedImageIndex]?.image_url || '/placeholder.jpg'}
             alt={product.name}
-            fill
-            className="object-cover"
+            fill 
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-contain"
+            key={sortedImages[selectedImageIndex]?.image_url || 'placeholder'}
+            onLoadingComplete={(img) => {
+              const w = img.naturalWidth || 1
+              const h = img.naturalHeight || 1
+              setMainAspectRatio(`${w} / ${h}`)
+            }}
             priority
           />
         </div>
