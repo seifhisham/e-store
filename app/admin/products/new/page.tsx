@@ -10,6 +10,9 @@ import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import { CATEGORIES } from '@/lib/categories'
 
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+const COLORS = ['Black', 'White', 'Gray', 'Navy', 'Blue', 'Red', 'Green', 'Beige', 'Brown', 'Pink', 'Purple', 'Yellow', 'Orange']
+
 export default function NewProductPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -273,11 +276,10 @@ export default function NewProductPage() {
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description *
+              Description
             </label>
             <textarea
               name="description"
-              required
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:black placeholder:text-black"
@@ -313,6 +315,12 @@ export default function NewProductPage() {
             </Button>
           </div>
 
+          <datalist id="sizes-list">
+            {SIZES.map((s) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
+
           {formData.variants.map((variant, index) => (
             <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-4 border border-gray-200 rounded-lg">
               <div>
@@ -321,9 +329,10 @@ export default function NewProductPage() {
                 </label>
                 <Input
                   value={variant.size}
-                  className="placeholder:text-black"
                   onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-                  placeholder="S, M, L, XL"
+                  placeholder="e.g. M or 32"
+                  list="sizes-list"
+                  className="placeholder:text-black"
                 />
               </div>
               
@@ -331,12 +340,15 @@ export default function NewProductPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Color
                 </label>
-                <Input
+                <Select
                   value={variant.color}
-                  className="placeholder:text-black"
                   onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
-                  placeholder="Red, Blue, etc."
-                />
+                >
+                  <option value="">Select color</option>
+                  {COLORS.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </Select>
               </div>
               
               <div>

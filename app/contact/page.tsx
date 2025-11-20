@@ -14,7 +14,7 @@ export default function ContactPage() {
               Questions about an order, product sizing, or shipping? We’re here to help.
             </p>
             <div className="mt-8 flex gap-3">
-              <a href="mailto:support@example.com">
+              <a href="mailto:adoore.eg@gmail.com">
                 <Button className="bg-black text-white hover:bg-primary hover:text-foreground">Email Support</Button>
               </a>
               <Link href="/about">
@@ -35,7 +35,7 @@ export default function ContactPage() {
               </div>
               <h3 className="font-semibold text-gray-900">Customer Support</h3>
             </div>
-            <p className="text-sm text-gray-700">support@example.com</p>
+            <p className="text-sm text-gray-700">adoore.eg@gmail.com</p>
           </div>
 
           <div className="rounded-lg border bg-white p-6">
@@ -78,7 +78,7 @@ export default function ContactPage() {
             <h3 className="text-xl font-semibold text-gray-900">Need quick assistance?</h3>
             <p className="text-gray-600">Email our support team and we’ll respond as soon as possible.</p>
           </div>
-          <a href="mailto:support@example.com">
+          <a href="mailto:adoore.eg@gmail.com">
             <Button className="bg-black text-white hover:bg-primary hover:text-foreground">Contact Support</Button>
           </a>
         </div>

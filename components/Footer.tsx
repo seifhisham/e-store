@@ -12,13 +12,13 @@ export function Footer() {
               Your one-stop destination for the latest fashion trends and quality clothing.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-black hover:text-white">
+              {/* <a href="#" className="text-black hover:text-white">
                 Facebook
+              </a> */}
+              <a href="https://www.tiktok.com/@adoore.eg" className="text-black hover:text-white">
+                TikTok
               </a>
-              <a href="#" className="text-black hover:text-white">
-                Twitter
-              </a>
-              <a href="#" className="text-black hover:text-white">
+              <a href="https://www.instagram.com/adoore.eg?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" className="text-black hover:text-white">
                 Instagram
               </a>
             </div>
