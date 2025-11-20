@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -9,6 +9,9 @@ import { Select } from '@/components/ui/Select'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import { CATEGORIES } from '@/lib/categories'
+
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+const COLORS = ['Black', 'White', 'Gray', 'Navy', 'Blue', 'Red', 'Green', 'Beige', 'Brown', 'Pink', 'Purple', 'Yellow', 'Orange']
 
 type VariantForm = {
   id?: string
@@ -44,6 +47,23 @@ export default function EditProductPage() {
 
   const [originalVariantIds, setOriginalVariantIds] = useState<string[]>([])
   const [originalImageIds, setOriginalImageIds] = useState<string[]>([])
+
+  // Include any existing non-standard values from the loaded product together with defaults
+  const dynamicSizes = useMemo(() => {
+    const set = new Set<string>(SIZES)
+    for (const v of formData.variants) {
+      if (v.size) set.add(v.size)
+    }
+    return Array.from(set)
+  }, [formData.variants])
+
+  const dynamicColors = useMemo(() => {
+    const set = new Set<string>(COLORS)
+    for (const v of formData.variants) {
+      if (v.color) set.add(v.color)
+    }
+    return Array.from(set)
+  }, [formData.variants])
 
   useEffect(() => {
     if (!productId) return
@@ -336,10 +356,9 @@ export default function EditProductPage() {
           </div>
 
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
             <textarea
               name="description"
-              required
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               className="w-full px-3 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:black placeholder:text-black"
@@ -372,26 +391,36 @@ export default function EditProductPage() {
             </Button>
           </div>
 
+          <datalist id="sizes-list">
+            {dynamicSizes.map((s) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
+
           {formData.variants.map((variant, index) => (
             <div key={variant.id ?? index} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-4 border border-gray-200 rounded-lg">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
                 <Input
                   value={variant.size}
-                  className="placeholder:text-black"
                   onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-                  placeholder="S, M, L, XL"
+                  placeholder="e.g. M or 32"
+                  list="sizes-list"
+                  className="placeholder:text-black"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
-                <Input
+                <Select
                   value={variant.color}
-                  className="placeholder:text-black"
                   onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
-                  placeholder="Red, Blue, etc."
-                />
+                >
+                  <option value="">Select color</option>
+                  {dynamicColors.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </Select>
               </div>
 
               <div>

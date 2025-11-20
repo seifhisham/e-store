@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useCart } from '@/contexts/CartContext'
 import { Button } from '@/components/ui/Button'
-import { Select } from '@/components/ui/Select'
 import Image from 'next/image'
 import { Minus, Plus, Heart, Share2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import { getColorHex } from '@/lib/colors'
 
 interface Product {
   id: string
@@ -31,6 +31,8 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
   const { addToCart } = useCart()
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0])
+  const [selectedSize, setSelectedSize] = useState(product.variants[0]?.size || '')
+  const [selectedColor, setSelectedColor] = useState(product.variants[0]?.color || '')
   const [quantity, setQuantity] = useState(1)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isAdding, setIsAdding] = useState(false)
@@ -38,6 +40,24 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   const sortedImages = [...product.images].sort((a, b) => a.display_order - b.display_order)
   const price = product.base_price + (selectedVariant?.price_adjustment || 0)
+
+  const sizes = useMemo(() => Array.from(new Set(product.variants.map(v => v.size))), [product.variants])
+  const colorsForSelectedSize = useMemo(() => {
+    return Array.from(new Set(product.variants.filter(v => v.size === selectedSize).map(v => v.color)))
+  }, [product.variants, selectedSize])
+
+  const isSizeOutOfStock = (size: string) => {
+    return product.variants.filter(v => v.size === size).every(v => (v.stock_quantity || 0) <= 0)
+  }
+
+  const getVariant = (size: string, color: string) => {
+    return product.variants.find(v => v.size === size && v.color === color)
+  }
+
+  const isColorUnavailable = (size: string, color: string) => {
+    const v = getVariant(size, color)
+    return !v || (v.stock_quantity || 0) <= 0
+  }
 
   const handleAddToCart = async () => {
     if (!selectedVariant) return
@@ -123,30 +143,93 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         <p className="text-black leading-relaxed">{product.description}</p>
 
         {/* Variant Selection */}
-        {product.variants.length > 1 && (
-          <div className="space-y-4">
+        {product.variants.length > 0 && (
+          <div className="space-y-6">
+            {/* Sizes */}
             <div>
-              <label className="block text-sm font-medium text-black mb-2">
-                Size & Color
-              </label>
-              <Select
-                value={selectedVariant?.id || ''}
-                onChange={(e) => {
-                  const variant = product.variants.find(v => v.id === e.target.value)
-                  if (variant) {
-                    setSelectedVariant(variant)
-                    setQuantity(1)
-                  }
-                }}
-                className="w-full"
-              >
-                {product.variants.map((variant) => (
-                  <option key={variant.id} value={variant.id}>
-                    {variant.size} - {variant.color} 
-                    {variant.stock_quantity === 0 ? ' (Out of Stock)' : ''}
-                  </option>
-                ))}
-              </Select>
+              <label className="block text-sm font-medium text-black mb-2">Size</label>
+              <div className="flex flex-wrap gap-2">
+                {sizes.map((size) => {
+                  const disabled = isSizeOutOfStock(size)
+                  const isActive = selectedSize === size
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => {
+                        if (disabled) return
+                        setSelectedSize(size)
+                        // Try keep color; if invalid or OOS, pick first available color for this size
+                        let color = selectedColor
+                        let v = getVariant(size, color)
+                        if (!v || (v.stock_quantity || 0) <= 0) {
+                          const firstAvailable = product.variants.find(x => x.size === size && (x.stock_quantity || 0) > 0)
+                          color = firstAvailable?.color || (colorsForSelectedSize[0] || '')
+                          v = firstAvailable || (color ? getVariant(size, color) || undefined : undefined)
+                        }
+                        if (v) {
+                          setSelectedColor(v.color)
+                          setSelectedVariant(v)
+                          setQuantity(1)
+                        }
+                      }}
+                      className={`px-3 py-2 rounded-full border text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-black ${
+                        disabled
+                          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                          : isActive
+                            ? 'bg-black text-white border-black'
+                            : 'bg-white text-black border-gray-300 hover:border-black'
+                      }`}
+                      aria-pressed={isActive}
+                      aria-disabled={disabled}
+                    >
+                      {size}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Colors */}
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">Color</label>
+              <div className="flex flex-wrap gap-3">
+                {colorsForSelectedSize.map((color) => {
+                  const disabled = isColorUnavailable(selectedSize, color)
+                  const isActive = selectedColor === color
+                  return (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => {
+                        if (disabled) return
+                        setSelectedColor(color)
+                        const v = getVariant(selectedSize, color)
+                        if (v) {
+                          setSelectedVariant(v)
+                          setQuantity(1)
+                        }
+                      }}
+                      className={`group inline-flex items-center gap-2 px-3 py-2 rounded-full border text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-black ${
+                        disabled
+                          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                          : isActive
+                            ? 'bg-white text-black border-black'
+                            : 'bg-white text-black border-gray-300 hover:border-black'
+                      }`}
+                      aria-pressed={isActive}
+                      aria-disabled={disabled}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 rounded-full border ${isActive ? 'border-black' : 'border-gray-300'} ${disabled ? 'opacity-40' : ''}`}
+                        style={{ backgroundColor: getColorHex(color) }}
+                        aria-hidden
+                      />
+                      <span>{color}</span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           </div>
         )}
