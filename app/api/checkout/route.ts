@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createPaymentRequest } from '@/lib/paymob-server'
+import { getActiveDiscountPercent } from '@/lib/discounts'
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,6 +38,9 @@ export async function POST(request: NextRequest) {
     // Calculate total from trusted DB values
     let totalAmount = 0
     const paymobItems: Array<{ name: string; amount_cents: number; description?: string; quantity: number }> = []
+
+    // Cache discount percentage per product for this request
+    const discountCache = new Map<string, number>()
     for (const item of cartItems) {
       const product = productMap.get(item.product_id)
       const variant = variantMap.get(item.variant_id)
@@ -50,7 +54,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Insufficient stock' }, { status: 400 })
       }
 
-      const unitPrice = (product.base_price || 0) + (variant.price_adjustment || 0)
+      const baseUnit = (product.base_price || 0) + (variant.price_adjustment || 0)
+      let percent = discountCache.get(item.product_id)
+      if (percent == null) {
+        percent = await getActiveDiscountPercent(item.product_id)
+        discountCache.set(item.product_id, percent)
+      }
+      const unitPrice = percent > 0 ? Math.max(0, baseUnit * (1 - percent / 100)) : baseUnit
       totalAmount += unitPrice * item.quantity
       paymobItems.push({
         name: product.name,
@@ -86,7 +96,9 @@ export async function POST(request: NextRequest) {
     for (const item of cartItems) {
       const product = productMap.get(item.product_id)!
       const variant = variantMap.get(item.variant_id)!
-      const unitPrice = (product.base_price || 0) + (variant.price_adjustment || 0)
+      const baseUnit = (product.base_price || 0) + (variant.price_adjustment || 0)
+      const percent = discountCache.get(item.product_id) || 0
+      const unitPrice = percent > 0 ? Math.max(0, baseUnit * (1 - percent / 100)) : baseUnit
       await supabase.from('order_items').insert({
         order_id: order.id,
         product_id: item.product_id,

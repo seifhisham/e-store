@@ -28,9 +28,10 @@ interface ProductCardProps {
   product: Product
   isNew?: boolean
   showActions?: boolean
+  discountPercent?: number
 }
 
-export function ProductCard({ product, isNew, showActions = true }: ProductCardProps) {
+export function ProductCard({ product, isNew, showActions = true, discountPercent = 0 }: ProductCardProps) {
   const { addToCart } = useCart()
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0])
   const [isAdding, setIsAdding] = useState(false)
@@ -39,6 +40,7 @@ export function ProductCard({ product, isNew, showActions = true }: ProductCardP
 
   const primaryImage = product.images.find(img => img.is_primary) || product.images[0]
   const price = product.base_price + (selectedVariant?.price_adjustment || 0)
+  const discountedPrice = discountPercent > 0 ? Math.max(0, price * (1 - discountPercent / 100)) : price
 
   const handleAddToCart = async () => {
     if (!selectedVariant) {
@@ -66,6 +68,11 @@ export function ProductCard({ product, isNew, showActions = true }: ProductCardP
               New
             </span>
           )}
+          {discountPercent > 0 && (
+            <span className="absolute right-2 top-2 z-10 rounded-full bg-black px-2 py-1 text-xs font-semibold text-white" aria-label={`Sale ${Math.round(discountPercent)}%`}>
+              -{Math.round(discountPercent)}%
+            </span>
+          )}
           <Image
             src={primaryImage?.image_url || '/placeholder.jpg'}
             alt={product.name}
@@ -84,9 +91,14 @@ export function ProductCard({ product, isNew, showActions = true }: ProductCardP
               {product.name}
             </Link>
           </h3>
-          <span className="mt-1 block text-base font-medium text-black">
-            {formatCurrency(price)}
-          </span>
+          {discountPercent > 0 ? (
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-base font-semibold text-black">{formatCurrency(discountedPrice)}</span>
+              <span className="text-sm text-black/60 line-through">{formatCurrency(price)}</span>
+            </div>
+          ) : (
+            <span className="mt-1 block text-base font-medium text-black">{formatCurrency(price)}</span>
+          )}
         </div>
         
         {showActions && (

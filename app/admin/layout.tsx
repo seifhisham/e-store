@@ -79,6 +79,15 @@ export default async function AdminLayout({
                 </li>
                 <li>
                   <Link
+                    href="/admin/discounts"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
+                  >
+                    <Settings className="w-4 h-4 mr-3" />
+                    Discounts
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/admin/orders"
                     className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
                   >

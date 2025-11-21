@@ -26,9 +26,10 @@ interface Product {
 
 interface ProductDetailClientProps {
   product: Product
+  discountPercent?: number
 }
 
-export function ProductDetailClient({ product }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, discountPercent = 0 }: ProductDetailClientProps) {
   const { addToCart } = useCart()
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0])
   const [selectedSize, setSelectedSize] = useState(product.variants[0]?.size || '')
@@ -40,6 +41,7 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   const sortedImages = [...product.images].sort((a, b) => a.display_order - b.display_order)
   const price = product.base_price + (selectedVariant?.price_adjustment || 0)
+  const discountedPrice = discountPercent > 0 ? Math.max(0, price * (1 - discountPercent / 100)) : price
 
   const sizes = useMemo(() => Array.from(new Set(product.variants.map(v => v.size))), [product.variants])
   const colorsForSelectedSize = useMemo(() => {
@@ -132,12 +134,15 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
         </div>
 
         <div className="flex items-center space-x-4">
-          <span className="text-3xl font-bold text-gray-900">{formatCurrency(price)}</span>
-          {/* {selectedVariant?.price_adjustment !== 0 && (
-            <span className="text-lg text-gray-500 line-through">
-              {formatCurrency(product.base_price)}
-            </span>
-          )} */}
+          {discountPercent > 0 ? (
+            <>
+              <span className="text-3xl font-bold text-black">{formatCurrency(discountedPrice)}</span>
+              <span className="text-lg text-black/60 line-through">{formatCurrency(price)}</span>
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-black text-white">-{Math.round(discountPercent)}%</span>
+            </>
+          ) : (
+            <span className="text-3xl font-bold text-gray-900">{formatCurrency(price)}</span>
+          )}
         </div>
 
         <p className="text-black leading-relaxed">{product.description}</p>

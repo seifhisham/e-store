@@ -39,6 +39,11 @@ export default function SignIn() {
     <div className="min-h-screen bg-gray-50 relative">
       <div className="pointer-events-none absolute inset-0 [background:radial-gradient(1000px_600px_at_50%_-50%,rgba(99,102,241,0.15),rgba(255,255,255,0))]" />
       <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="mb-8 text-center">
+          <Link href="/" style={{ fontFamily: "'Adore Modern Serif', serif" }} className="inline-block select-none text-3xl font-bold tracking-widest text-black">
+            ADOORE
+          </Link>
+        </div>
         <div className="mx-auto max-w-xl">
           <div className="bg-white/90 backdrop-blur rounded-2xl border shadow-sm p-8">
             <div className="text-center mb-6">

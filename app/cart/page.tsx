@@ -6,13 +6,42 @@ import { Input } from '@/components/ui/Input'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { formatCurrency } from '@/lib/utils'
 
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, getTotalPrice, loading } = useCart()
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
   const shipping = 80
+
+  const [discounts, setDiscounts] = useState<Record<string, number>>({})
+
+  useEffect(() => {
+    const run = async () => {
+      if (!items || items.length === 0) {
+        setDiscounts({})
+        return
+      }
+      const productIds = Array.from(new Set(items.map(i => i.product_id)))
+      const res = await fetch('/api/discounts/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productIds }),
+      })
+      const json = await res.json()
+      setDiscounts(json.percents || {})
+    }
+    run()
+  }, [items])
+
+  const discountedSubtotal = useMemo(() => {
+    return items.reduce((total, item) => {
+      const base = (item.product.base_price || 0) + (item.variant.price_adjustment || 0)
+      const percent = discounts[item.product_id] || 0
+      const unit = percent > 0 ? Math.max(0, base * (1 - percent / 100)) : base
+      return total + unit * item.quantity
+    }, 0)
+  }, [items, discounts])
 
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return
@@ -81,7 +110,9 @@ export default function CartPage() {
             <div className="bg-white rounded-lg shadow-sm border">
               {items.map((item) => {
                 const isUpdating = updatingItems.has(item.id)
-                const price = item.product.base_price + item.variant.price_adjustment
+                const base = item.product.base_price + item.variant.price_adjustment
+                const percent = discounts[item.product.id] || 0
+                const price = percent > 0 ? Math.max(0, base * (1 - percent / 100)) : base
                 
                 return (
                   <div key={item.id} className="p-4 sm:p-6 border-b last:border-b-0">
@@ -108,9 +139,16 @@ export default function CartPage() {
                         <p className="text-sm text-black whitespace-normal">
                           {item.variant.size} - {item.variant.color}
                         </p>
-                        <p className="text-base sm:text-lg font-semibold text-black mt-1">
-                          {formatCurrency(price)}
-                        </p>
+                        <div className="text-base sm:text-lg font-semibold text-black mt-1">
+                          {percent > 0 ? (
+                            <div className="flex items-baseline gap-2">
+                              <span>{formatCurrency(price)}</span>
+                              <span className="text-sm text-black/60 line-through">{formatCurrency(base)}</span>
+                            </div>
+                          ) : (
+                            <span>{formatCurrency(price)}</span>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Quantity Controls */}
@@ -165,7 +203,7 @@ export default function CartPage() {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-black">Subtotal</span>
-                  <span className="font-medium text-black">{formatCurrency(getTotalPrice())}</span>
+                  <span className="font-medium text-black">{formatCurrency(discountedSubtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-black">Shipping</span>
@@ -174,12 +212,7 @@ export default function CartPage() {
                 <div className="border-t pt-3">
                   <div className="flex justify-between text-lg font-semibold text-black">
                     <span>Total</span>
-                    <span>
-                      {(() => {
-                        const subtotal = getTotalPrice()
-                        return formatCurrency(subtotal + shipping)
-                      })()}
-                    </span>
+                    <span>{formatCurrency(discountedSubtotal + shipping)}</span>
                   </div>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useCart } from '@/contexts/CartContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -18,6 +18,26 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod' | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
+
+  // Fetch active discount percentages for products in the cart to reflect UI totals
+  const [discounts, setDiscounts] = useState<Record<string, number>>({})
+  useEffect(() => {
+    const run = async () => {
+      if (!items || items.length === 0) {
+        setDiscounts({})
+        return
+      }
+      const productIds = Array.from(new Set(items.map(i => i.product_id)))
+      const res = await fetch('/api/discounts/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productIds }),
+      })
+      const json = await res.json()
+      setDiscounts(json.percents || {})
+    }
+    run()
+  }, [items])
 
   const [shippingAddress, setShippingAddress] = useState({
     firstName: '',
@@ -142,9 +162,23 @@ export default function CheckoutPage() {
     }
   }
 
-  const subtotal = getTotalPrice()
   const shipping = 80
-  const total = subtotal + shipping
+  const discountedSubtotal = useMemo(() => {
+    return items.reduce((total, item) => {
+      const base = (item.product.base_price || 0) + (item.variant.price_adjustment || 0)
+      const percent = discounts[item.product_id] || 0
+      const unit = percent > 0 ? Math.max(0, base * (1 - percent / 100)) : base
+      return total + unit * item.quantity
+    }, 0)
+  }, [items, discounts])
+  const originalSubtotal = useMemo(() => {
+    return items.reduce((total, item) => {
+      const base = (item.product.base_price || 0) + (item.variant.price_adjustment || 0)
+      return total + base * item.quantity
+    }, 0)
+  }, [items])
+  const savings = Math.max(0, originalSubtotal - discountedSubtotal)
+  const total = discountedSubtotal + shipping
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -354,9 +388,15 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-sm">
                 <span className="text-foreground/80">Subtotal</span>
                 <span className="font-medium text-black">
-                  {formatCurrency(subtotal)}
+                  {formatCurrency(discountedSubtotal)}
                 </span>
               </div>
+              {savings > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-green-700">You saved</span>
+                  <span className="font-medium text-green-700">-{formatCurrency(savings)}</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm">
                 <span className="text-foreground/80">Shipping</span>
                 <span className="font-medium text-black">
@@ -378,19 +418,30 @@ export default function CheckoutPage() {
               </h3>
               <div className="space-y-2">
                 {items.map((item) => {
-                  const price =
-                    item.product.base_price + item.variant.price_adjustment;
+                  const base = (item.product.base_price || 0) + (item.variant.price_adjustment || 0)
+                  const percent = discounts[item.product_id] || 0
+                  const unit = percent > 0 ? Math.max(0, base * (1 - percent / 100)) : base
+                  const discountedTotal = unit * item.quantity
+                  const originalTotal = base * item.quantity
+                  const lineSavings = Math.max(0, originalTotal - discountedTotal)
                   return (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <span className="text-foreground/80">
-                        {item.product.name} ({item.variant.size},{" "}
-                        {item.variant.color}) x {item.quantity}
+                    <div key={item.id} className="flex justify-between items-start text-sm">
+                      <span className="text-foreground/80 pr-3">
+                        {item.product.name} ({item.variant.size}, {item.variant.color}) x {item.quantity}
                       </span>
-                      <span className="font-medium text-black">
-                        {formatCurrency(price * item.quantity)}
+                      <span className="text-right">
+                        {percent > 0 ? (
+                          <span className="flex flex-col items-end">
+                            <span className="font-medium text-black">{formatCurrency(discountedTotal)}</span>
+                            <span className="text-xs text-foreground/60 line-through">{formatCurrency(originalTotal)}</span>
+                            <span className="text-xs text-green-700">- {formatCurrency(lineSavings)}</span>
+                          </span>
+                        ) : (
+                          <span className="font-medium text-black">{formatCurrency(originalTotal)}</span>
+                        )}
                       </span>
                     </div>
-                  );
+                  )
                 })}
               </div>
             </div>

@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext'
 import { ProductDetailClient } from './ProductDetailClient'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
+import { getActiveDiscountPercent } from '@/lib/discounts'
 
 interface ProductPageProps {
   params: Promise<{
@@ -36,6 +37,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound()
   }
 
+  // Resolve active discount percent for this product (server-side)
+  const discountPercent = await getActiveDiscountPercent(product.id)
+
   // Fetch related products
   const { data: relatedProducts } = await supabase
     .from('products')
@@ -55,7 +59,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ProductDetailClient product={product} />
+        <ProductDetailClient product={product} discountPercent={discountPercent} />
         
         {/* Related Products */}
         {relatedProducts && relatedProducts.length > 0 && (
@@ -64,9 +68,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
               Related Products
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map((relatedProduct) => (
-                <ProductCard key={relatedProduct.id} product={relatedProduct} />
-              ))}
+              {await (async () => {
+                const discMap = new Map<string, number>()
+                await Promise.all(
+                  relatedProducts.map(async (rp: any) => {
+                    const d = await getActiveDiscountPercent(rp.id)
+                    discMap.set(rp.id, d)
+                  })
+                )
+                return relatedProducts.map((relatedProduct) => (
+                  <ProductCard key={relatedProduct.id} product={relatedProduct} discountPercent={discMap.get(relatedProduct.id) || 0} />
+                ))
+              })()}
             </div>
           </section>
         )}
