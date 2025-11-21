@@ -140,12 +140,14 @@ export default function AdminUsersClient() {
                 {users.map((u) => (
                   <tr key={u.id} className="border-b border-border/60">
                     <td className="py-2 pr-4">{u.email}</td>
-                    <td className="py-2 pr-4">
-                      <span className={
-                        u.role === 'admin'
-                          ? 'px-2 py-1 rounded bg-primary text-black'
-                          : 'px-2 py-1 rounded bg-secondary text-black'
-                      }>
+                    <td className="py-2 pr-4 whitespace-nowrap">
+                      <span
+                        className={
+                          u.role === 'admin'
+                            ? 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium uppercase tracking-wide bg-black text-white whitespace-nowrap'
+                            : 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium uppercase tracking-wide bg-gray-100 text-gray-800 whitespace-nowrap'
+                        }
+                      >
                         {u.role}
                       </span>
                     </td>

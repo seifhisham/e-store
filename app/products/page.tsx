@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
 import { Search } from 'lucide-react'
 import { ProductsToolbar } from '@/components/ProductsToolbar'
+import { getActiveDiscountPercent } from '@/lib/discounts'
 
 
 interface SearchParams {
@@ -127,6 +128,16 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const to = from + pageSize - 1
 
   const { data: products, count } = await query.range(from, to)
+  // Resolve discounts for listing cards
+  const discountPercents = new Map<string, number>()
+  if (products && products.length > 0) {
+    await Promise.all(
+      products.map(async (p: any) => {
+        const d = await getActiveDiscountPercent(p.id)
+        discountPercents.set(p.id, d)
+      })
+    )
+  }
   const totalPages = Math.max(1, Math.ceil((count || 0) / pageSize))
 
   
@@ -146,7 +157,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             {products && products.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard key={product.id} product={product} discountPercent={discountPercents.get(product.id) || 0} />
                 ))}
               </div>
             ) : (

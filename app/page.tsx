@@ -4,6 +4,7 @@ import { NewCollectionBanner } from "@/components/NewCollectionBanner";
 import { createClient } from "@/lib/supabase/server";
 import { HeroSection } from "@/components/HeroSection";
 import { CATEGORIES } from "@/lib/categories";
+import { getActiveDiscountPercent } from "@/lib/discounts";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -27,6 +28,15 @@ export default async function Home() {
         .limit(4);
 
       return { category: cat, products: data || [] };
+    })
+  );
+
+  // Resolve discounts for all products shown on the homepage categories
+  const discountMap = new Map<string, number>();
+  await Promise.all(
+    sections.flatMap(s => (s.products || [])).map(async (p: any) => {
+      const d = await getActiveDiscountPercent(p.id);
+      discountMap.set(p.id, d);
     })
   );
 
@@ -59,7 +69,7 @@ export default async function Home() {
               </h2>
               <div className="mt-5 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {products.map((p: any) => (
-                  <ProductCard key={p.id} product={p} isNew={isNew(p.created_at)} showActions={false} />
+                  <ProductCard key={p.id} product={p} isNew={isNew(p.created_at)} showActions={false} discountPercent={discountMap.get(p.id) || 0} />
                 ))}
               </div>
               <div className="mt-6 flex justify-center">
