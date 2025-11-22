@@ -264,27 +264,27 @@ export default function AdminDiscountsPage() {
         ) : (
           <div className="divide-y">
             {discounts.map((d) => (
-              <div key={d.id} className="flex items-center justify-between px-6 py-4">
-                <div className="space-y-1">
+              <div key={d.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4">
+                <div className="space-y-1 w-full sm:w-auto">
                   <div className="flex items-center gap-2">
-                    <p className="text-foreground font-semibold">{d.name}</p>
+                    <p className="text-foreground font-semibold break-words">{d.name}</p>
                     {d.active ? (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800">Active</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 whitespace-nowrap">Active</span>
                     ) : (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-800">Inactive</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 whitespace-nowrap">Inactive</span>
                     )}
                   </div>
-                  <p className="text-sm text-foreground/70">{d.percentage}% • {d.starts_at ? new Date(d.starts_at).toLocaleDateString() : 'No start'} → {d.ends_at ? new Date(d.ends_at).toLocaleDateString() : 'No end'}</p>
+                  <p className="text-xs sm:text-sm text-foreground/70">{d.percentage}% • {d.starts_at ? new Date(d.starts_at).toLocaleDateString() : 'No start'} → {d.ends_at ? new Date(d.ends_at).toLocaleDateString() : 'No end'}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => toggleActive(d)}>
+                <div className="flex flex-col w-full sm:w-auto sm:flex-row gap-2">
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => toggleActive(d)}>
                     {d.active ? <X className="w-4 h-4 mr-2" /> : <Check className="w-4 h-4 mr-2" />}
                     {d.active ? 'Deactivate' : 'Activate'}
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => openAssign(d)}>
+                  <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => openAssign(d)}>
                     Assign Products
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => deleteDiscount(d)} className="text-red-600 hover:text-red-700">
+                  <Button variant="outline" size="sm" onClick={() => deleteDiscount(d)} className="w-full sm:w-auto text-red-600 hover:text-red-700">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
