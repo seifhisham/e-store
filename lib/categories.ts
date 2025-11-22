@@ -47,4 +47,16 @@ export const CATEGORIES: CategoryItem[] = [
     image:
       'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=1600&h=1200&auto=format&fit=crop',
   }, 
+  {
+    value: 'Men',
+    label: 'Men',
+    image:
+      'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=1600&h=1200&auto=format&fit=crop',
+  },
+  {
+    value: 'Unisex',
+    label: 'Unisex',
+    image:
+      'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?q=80&w=1600&h=1200&auto=format&fit=crop',
+  },
 ]
