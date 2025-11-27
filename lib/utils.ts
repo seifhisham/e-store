@@ -5,15 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(amount: number) {
+export function formatCurrency(amount: number, fractionDigits: number = 2) {
   try {
     return new Intl.NumberFormat('en-EG', {
       style: 'currency',
       currency: 'EGP',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
     }).format(amount)
   } catch {
-    return `EGP ${amount.toFixed(2)}`
+    return `EGP ${amount.toFixed(fractionDigits)}`
   }
 }

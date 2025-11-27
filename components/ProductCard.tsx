@@ -93,11 +93,11 @@ export function ProductCard({ product, isNew, showActions = true, discountPercen
           </h3>
           {discountPercent > 0 ? (
             <div className="mt-1 flex items-baseline gap-1">
-              <span className="text-sm sm:text-base font-semibold text-black whitespace-nowrap">{formatCurrency(discountedPrice)}</span>
-              <span className="text-xs sm:text-sm text-black/60 line-through whitespace-nowrap">{formatCurrency(price)}</span>
+              <span className="text-sm sm:text-base font-semibold text-black whitespace-nowrap">{formatCurrency(discountedPrice, 0)}</span>
+              <span className="text-xs sm:text-sm text-black/60 line-through whitespace-nowrap">{formatCurrency(price, 0)}</span>
             </div>
           ) : (
-            <span className="mt-1 block text-sm sm:text-base font-medium text-black whitespace-nowrap">{formatCurrency(price)}</span>
+            <span className="mt-1 block text-sm sm:text-base font-medium text-black whitespace-nowrap">{formatCurrency(price, 0)}</span>
           )}
         </div>
         
