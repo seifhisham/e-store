@@ -73,7 +73,7 @@ export function Footer() {
 
         <div className="border-t border-border mt-8 pt-8 text-center">
           <p className="text-black">
-            © 2024 E-Store. All rights reserved.
+            © 2024 ADOORE. All rights reserved.
           </p>
         </div>
       </div>
