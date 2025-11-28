@@ -7,7 +7,9 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-2xl font-bold mb-4">E-Store</h3>
+            <h3 className="text-2xl text-white"
+            style={{ fontFamily: "'Adore Modern Serif', serif" }}
+            >ADOORE</h3>
             <p className="text-black mb-4">
               Your one-stop destination for the latest fashion trends and quality clothing.
             </p>
