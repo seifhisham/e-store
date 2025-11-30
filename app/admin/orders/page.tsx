@@ -85,7 +85,7 @@ export default async function AdminOrdersPage() {
                       {order.order_items?.length || 0} items
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${order.total_amount.toFixed(2)}
+                      EGP{order.total_amount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <OrderStatusSelect
