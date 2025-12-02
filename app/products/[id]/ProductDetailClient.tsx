@@ -31,9 +31,10 @@ interface ProductDetailClientProps {
 
 export function ProductDetailClient({ product, discountPercent = 0 }: ProductDetailClientProps) {
   const { addToCart } = useCart()
-  const [selectedVariant, setSelectedVariant] = useState(product.variants[0])
-  const [selectedSize, setSelectedSize] = useState(product.variants[0]?.size || '')
-  const [selectedColor, setSelectedColor] = useState(product.variants[0]?.color || '')
+  const firstAvailable = product.variants.find(v => (v.stock_quantity || 0) > 0) || product.variants[0]
+  const [selectedVariant, setSelectedVariant] = useState(firstAvailable)
+  const [selectedSize, setSelectedSize] = useState(firstAvailable?.size || '')
+  const [selectedColor, setSelectedColor] = useState(firstAvailable?.color || '')
   const [quantity, setQuantity] = useState(1)
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isAdding, setIsAdding] = useState(false)
@@ -47,6 +48,8 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
   const colorsForSelectedSize = useMemo(() => {
     return Array.from(new Set(product.variants.filter(v => v.size === selectedSize).map(v => v.color)))
   }, [product.variants, selectedSize])
+
+  const allOutOfStock = product.variants.length > 0 && product.variants.every(v => (v.stock_quantity || 0) <= 0)
 
   const isSizeOutOfStock = (size: string) => {
     return product.variants.filter(v => v.size === size).every(v => (v.stock_quantity || 0) <= 0)
@@ -64,9 +67,26 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
   const handleAddToCart = async () => {
     if (!selectedVariant) return
     
+    // If current selection is out of stock but some other variant is available, switch to it
+    let variant = selectedVariant
+    if ((variant.stock_quantity || 0) <= 0) {
+      const available = product.variants.find(v => (v.stock_quantity || 0) > 0)
+      if (!available) {
+        return
+      }
+      setSelectedVariant(available)
+      setSelectedSize(available.size)
+      setSelectedColor(available.color)
+      variant = available
+      // Reset quantity within stock
+      if (quantity > (variant.stock_quantity || 0)) {
+        setQuantity(1)
+      }
+    }
+
     setIsAdding(true)
     try {
-      await addToCart(product.id, selectedVariant.id, quantity)
+      await addToCart(product.id, variant.id, quantity)
     } finally {
       setIsAdding(false)
     }
@@ -269,13 +289,11 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
         <div className="space-y-4">
           <Button
             onClick={handleAddToCart}
-            disabled={!selectedVariant || selectedVariant.stock_quantity === 0 || isAdding}
+            disabled={allOutOfStock || isAdding}
             className="w-full bg-black text-white hover:bg-primary hover:text-foreground"
             size="lg"
           >
-            {isAdding ? 'Adding to Cart...' : 
-             selectedVariant?.stock_quantity === 0 ? 'Out of Stock' : 
-             'Add to Cart'}
+            {isAdding ? 'Adding to Cart...' : allOutOfStock ? 'Out of Stock' : 'Add to Cart'}
           </Button>
           
           {/* <div className="flex space-x-4">

@@ -29,6 +29,7 @@ interface CartContextType {
   loading: boolean
   addToCart: (productId: string, variantId: string, quantity?: number) => Promise<void>
   updateQuantity: (cartItemId: string, quantity: number) => Promise<void>
+  changeVariant: (cartItemId: string, newVariantId: string) => Promise<void>
   removeFromCart: (cartItemId: string) => Promise<void>
   clearCart: () => Promise<void>
   getTotalItems: () => number
@@ -179,6 +180,40 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const changeVariant = async (cartItemId: string, newVariantId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('cart_items')
+        .update({ variant_id: newVariantId })
+        .eq('id', cartItemId)
+        .select(`
+          id,
+          product_id,
+          variant_id,
+          quantity,
+          product:products(id, name, base_price, images:product_images(image_url, is_primary)),
+          variant:product_variants(id, size, color, price_adjustment, stock_quantity)
+        `)
+        .single()
+
+      if (error) throw error
+
+      const updated = normalizeItem(data)
+      setItems(prev => prev.map(it => (it.id === cartItemId ? updated : it)))
+
+      const max = updated.variant.stock_quantity || 0
+      if (max > 0 && updated.quantity > max) {
+        await updateQuantity(cartItemId, max)
+      }
+      if (max === 0) {
+        await removeFromCart(cartItemId)
+      }
+    } catch (error) {
+      console.error('Error changing variant:', error)
+      throw error
+    }
+  }
+
   const removeFromCart = async (cartItemId: string) => {
     try {
       const { error } = await supabase
@@ -234,6 +269,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     loading,
     addToCart,
     updateQuantity,
+    changeVariant,
     removeFromCart,
     clearCart,
     getTotalItems,
