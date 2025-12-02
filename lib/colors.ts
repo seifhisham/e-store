@@ -20,6 +20,7 @@ export const COLOR_MAP: Record<string, string> = {
   teal: '#008080',
   cyan: '#06b6d4',
   magenta: '#d946ef',
+  burgundy: '#800020',
 };
 
 function normalizeName(name: string) {
