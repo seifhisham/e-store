@@ -3,23 +3,32 @@
 import { useCart } from '@/contexts/CartContext'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { formatCurrency } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
+import { getColorHex } from '@/lib/colors'
 
 export default function CartPage() {
-  const { items, updateQuantity, removeFromCart, getTotalPrice, loading } = useCart()
+  const { items, updateQuantity, removeFromCart, getTotalPrice, loading, changeVariant } = useCart()
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
   const shipping = 80
 
   const [discounts, setDiscounts] = useState<Record<string, number>>({})
+  const [variantsByProduct, setVariantsByProduct] = useState<Record<string, Array<{ id: string; product_id: string; size: string; color: string; price_adjustment: number; stock_quantity: number }>>>({})
+  const [selSize, setSelSize] = useState<Record<string, string>>({})
+  const [selColor, setSelColor] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const run = async () => {
       if (!items || items.length === 0) {
         setDiscounts({})
+        setVariantsByProduct({})
+        setSelSize({})
+        setSelColor({})
         return
       }
       const productIds = Array.from(new Set(items.map(i => i.product_id)))
@@ -30,8 +39,37 @@ export default function CartPage() {
       })
       const json = await res.json()
       setDiscounts(json.percents || {})
+
+      // Fetch available variants for displayed products to allow switching
+      try {
+        const supabase = createClient()
+        const { data, error } = await supabase
+          .from('product_variants')
+          .select('id, product_id, size, color, price_adjustment, stock_quantity')
+          .in('product_id', productIds)
+        if (!error && data) {
+          const grouped: Record<string, any[]> = {}
+          for (const v of data as any[]) {
+            if (!grouped[v.product_id]) grouped[v.product_id] = []
+            grouped[v.product_id].push(v)
+          }
+          setVariantsByProduct(grouped)
+        }
+      } catch {}
     }
     run()
+  }, [items])
+
+  // Initialize selected size/color per cart item from current variant
+  useEffect(() => {
+    const nextSize: Record<string, string> = {}
+    const nextColor: Record<string, string> = {}
+    for (const it of items) {
+      nextSize[it.id] = it.variant.size
+      nextColor[it.id] = it.variant.color
+    }
+    setSelSize(nextSize)
+    setSelColor(nextColor)
   }, [items])
 
   const discountedSubtotal = useMemo(() => {
@@ -55,6 +93,46 @@ export default function CartPage() {
         newSet.delete(itemId)
         return newSet
       })
+    }
+  }
+
+  const handleVariantChange = async (itemId: string, _productId: string, newVariantId: string) => {
+    if (!newVariantId) return
+    setUpdatingItems(prev => new Set(prev).add(itemId))
+    try {
+      await changeVariant(itemId, newVariantId)
+    } finally {
+      setUpdatingItems(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(itemId)
+        return newSet
+      })
+    }
+  }
+
+  const handleSizeChange = async (itemId: string, productId: string, newSize: string) => {
+    setSelSize(prev => ({ ...prev, [itemId]: newSize }))
+    const productVariants = variantsByProduct[productId] || []
+    const current = items.find(i => i.id === itemId)
+    const preferredColor = selColor[itemId] ?? current?.variant.color
+    let candidate = productVariants.find(v => v.size === newSize && v.color === preferredColor && (v.stock_quantity || 0) > 0)
+    if (!candidate) candidate = productVariants.find(v => v.size === newSize && (v.stock_quantity || 0) > 0)
+    if (!candidate) candidate = productVariants.find(v => v.size === newSize)
+    if (candidate && current && current.variant.id !== candidate.id) {
+      setSelColor(prev => ({ ...prev, [itemId]: candidate!.color }))
+      await handleVariantChange(itemId, productId, candidate.id)
+    }
+  }
+
+  const handleColorChange = async (itemId: string, productId: string, newColor: string) => {
+    setSelColor(prev => ({ ...prev, [itemId]: newColor }))
+    const size = selSize[itemId] ?? items.find(i => i.id === itemId)?.variant.size
+    if (!size) return
+    const productVariants = variantsByProduct[productId] || []
+    const candidate = productVariants.find(v => v.size === size && v.color === newColor)
+    const current = items.find(i => i.id === itemId)
+    if (candidate && current && current.variant.id !== candidate.id) {
+      await handleVariantChange(itemId, productId, candidate.id)
     }
   }
 
@@ -136,9 +214,78 @@ export default function CartPage() {
                             {item.product.name}
                           </Link>
                         </h3>
-                        <p className="text-sm text-black whitespace-normal">
-                          {item.variant.size} - {item.variant.color}
-                        </p>
+                        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {/* Size selector as pills */}
+                          <div>
+                            <p className="text-xs text-black/60 mb-1">Size</p>
+                            <div className="flex gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible scroll-smooth">
+                              {Array.from(new Set((variantsByProduct[item.product_id] || []).map(v => v.size))).map((size) => {
+                                const selectedSize = selSize[item.id] ?? item.variant.size
+                                const isActive = selectedSize === size
+                                const sizeOOS = (variantsByProduct[item.product_id] || [])
+                                  .filter(v => v.size === size)
+                                  .every(v => (v.stock_quantity || 0) <= 0)
+                                return (
+                                  <button
+                                    key={size}
+                                    type="button"
+                                    onClick={() => !sizeOOS && handleSizeChange(item.id, item.product_id, size)}
+                                    disabled={sizeOOS || updatingItems.has(item.id)}
+                                    className={`shrink-0 snap-start px-3 py-1.5 rounded-full border text-xs sm:text-sm transition-all duration-200 ease-out hover:scale-[1.02] active:scale-95 ${
+                                      sizeOOS
+                                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                        : isActive
+                                          ? 'bg-black text-white border-black'
+                                          : 'bg-white text-black border-gray-300 hover:border-black'
+                                    }`}
+                                    aria-pressed={isActive}
+                                  >
+                                    {size}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Color selector as swatches */}
+                          <div>
+                            <p className="text-xs text-black/60 mb-1">Color</p>
+                            <div className="flex flex-wrap gap-2">
+                              {Array.from(new Set((variantsByProduct[item.product_id] || [])
+                                .filter(v => v.size === (selSize[item.id] ?? item.variant.size))
+                                .map(v => v.color))).map((color) => {
+                                  const selectedColor = selColor[item.id] ?? item.variant.color
+                                  const v = (variantsByProduct[item.product_id] || [])
+                                    .find(x => x.size === (selSize[item.id] ?? item.variant.size) && x.color === color)
+                                  const disabled = !v || (v.stock_quantity || 0) <= 0
+                                  const isActive = selectedColor === color
+                                  return (
+                                    <button
+                                      key={color}
+                                      type="button"
+                                      onClick={() => !disabled && handleColorChange(item.id, item.product_id, color)}
+                                      disabled={disabled || updatingItems.has(item.id)}
+                                      className={`group inline-flex items-center gap-2 shrink-0 snap-start px-3 py-1.5 rounded-full border text-xs sm:text-sm transition-all duration-200 ease-out hover:scale-[1.02] active:scale-95 ${
+                                        disabled
+                                          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                          : isActive
+                                            ? 'bg-white text-black border-black'
+                                            : 'bg-white text-black border-gray-300 hover:border-black'
+                                      }`}
+                                      aria-pressed={isActive}
+                                    >
+                                      <span
+                                        className={`inline-block h-4 w-4 rounded-full border transition-colors ${isActive ? 'border-black' : 'border-gray-300'} ${disabled ? 'opacity-40' : ''}`}
+                                        style={{ backgroundColor: getColorHex(color) }}
+                                        aria-hidden
+                                      />
+                                      <span>{color}</span>
+                                    </button>
+                                  )
+                                })}
+                            </div>
+                          </div>
+                        </div>
                         <div className="text-base sm:text-lg font-semibold text-black mt-1">
                           {percent > 0 ? (
                             <div className="flex items-baseline gap-2">

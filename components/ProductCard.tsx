@@ -33,10 +33,13 @@ interface ProductCardProps {
 
 export function ProductCard({ product, isNew, showActions = true, discountPercent = 0 }: ProductCardProps) {
   const { addToCart } = useCart()
-  const [selectedVariant, setSelectedVariant] = useState(product.variants[0])
+  const [selectedVariant, setSelectedVariant] = useState(
+    product.variants.find(v => (v.stock_quantity || 0) > 0) || product.variants[0]
+  )
   const [isAdding, setIsAdding] = useState(false)
 
   const hasVariants = product.variants && product.variants.length > 0
+  const allOutOfStock = hasVariants && product.variants.every(v => (v.stock_quantity || 0) <= 0)
 
   const primaryImage = product.images.find(img => img.is_primary) || product.images[0]
   const price = product.base_price + (selectedVariant?.price_adjustment || 0)
@@ -47,10 +50,20 @@ export function ProductCard({ product, isNew, showActions = true, discountPercen
       toast.error('Please select a variant')
       return
     }
+    let variant = selectedVariant
+    if ((variant.stock_quantity || 0) <= 0) {
+      const firstAvailable = product.variants.find(v => (v.stock_quantity || 0) > 0)
+      if (!firstAvailable) {
+        toast.error('Out of stock')
+        return
+      }
+      setSelectedVariant(firstAvailable)
+      variant = firstAvailable
+    }
 
     setIsAdding(true)
     try {
-      await addToCart(product.id, selectedVariant.id, 1)
+      await addToCart(product.id, variant.id, 1)
       toast.success('Added to cart')
     } catch (err) {
       toast.error('Failed to add to cart')
@@ -123,14 +136,12 @@ export function ProductCard({ product, isNew, showActions = true, discountPercen
           {hasVariants ? (
             <Button
               onClick={handleAddToCart}
-              disabled={!selectedVariant || selectedVariant.stock_quantity === 0 || isAdding}
+              disabled={allOutOfStock || isAdding}
               className="w-full bg-black text-white hover:bg-primary hover:text-foreground"
               size="sm"
               aria-label={`Add ${product.name} to cart`}
             >
-              {isAdding ? 'Adding...' : 
-               selectedVariant?.stock_quantity === 0 ? 'Out of Stock' : 
-               'Add to Cart'}
+              {isAdding ? 'Adding...' : allOutOfStock ? 'Out of Stock' : 'Add to Cart'}
             </Button>
           ) : (
             <Link href={`/products/${product.id}`}>

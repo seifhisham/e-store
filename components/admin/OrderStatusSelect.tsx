@@ -2,6 +2,7 @@
 
 import { SelectHTMLAttributes, useState, useTransition } from 'react'
 import { Select } from '@/components/ui/Select'
+import { cn } from '@/lib/utils'
 
 interface Option {
   value: string
@@ -36,7 +37,20 @@ export default function OrderStatusSelect({ action, defaultValue, name, classNam
     <Select
       value={value}
       name={name}
-      className={className}
+      className={cn(
+        // compact pill styling
+        'h-9 md:h-9 rounded-full px-3 text-xs font-medium border border-transparent cursor-pointer w-full',
+        // color coding by status
+        value === 'pending' && 'bg-amber-100 text-amber-800',
+        value === 'processing' && 'bg-blue-100 text-blue-800',
+        value === 'shipped' && 'bg-indigo-100 text-indigo-800',
+        value === 'completed' && 'bg-green-100 text-green-800',
+        value === 'cancelled' && 'bg-rose-100 text-rose-800',
+        // fallbacks + hover
+        (!value || !( ['pending','processing','shipped','completed','cancelled'].includes(value) )) && 'bg-gray-100 text-gray-800',
+        'transition-colors hover:brightness-95',
+        className,
+      )}
       onChange={handleChange}
       disabled={isPending}
     >
