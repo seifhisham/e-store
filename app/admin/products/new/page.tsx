@@ -9,9 +9,10 @@ import { Select } from '@/components/ui/Select'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import { CATEGORIES } from '@/lib/categories'
+import { COLOR_MAP } from '@/lib/colors'
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-const COLORS = ['Black', 'White', 'Gray', 'Navy', 'Blue', 'Red', 'Green', 'Beige', 'Brown', 'Pink', 'Purple', 'Yellow', 'Orange']
+const COLORS = Object.keys(COLOR_MAP).map(color => color.charAt(0).toUpperCase() + color.slice(1))
 
 export default function NewProductPage() {
   const router = useRouter()
