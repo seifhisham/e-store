@@ -68,13 +68,17 @@ export default async function AdminOrdersPage({ searchParams }: { searchParams?:
   }))
 
   // Helpers to build links preserving q/status
-  const buildLink = (next: Partial<Record<string, string | number>>) => {
+  const buildLink = (updates: Partial<Record<string, string | number>>) => {
     const params = new URLSearchParams()
-    if (status && status !== 'all') params.set('status', status)
-    if (q) params.set('q', q)
-    const nextPage = String(next.page ?? page)
-    params.set('page', nextPage)
-    return `/admin/orders?${params.toString()}`
+    // Always use the new status if provided, otherwise fall back to current status
+    const newStatus = 'status' in updates ? updates.status : status
+    if (newStatus && newStatus !== 'all') params.set('status', String(newStatus))
+    // Only include search query if it's not being cleared
+    if (q && !('q' in updates)) params.set('q', q)
+    // Use provided page or default to 1 for status changes, current page otherwise
+    const nextPage = 'page' in updates ? updates.page : ('status' in updates ? 1 : page)
+    if (nextPage) params.set('page', String(nextPage))
+    return `/admin/orders${params.toString() ? `?${params.toString()}` : ''}`
   }
 
   const statuses: Array<{ value: string; label: string }> = [
