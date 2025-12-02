@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createPaymentRequest } from '@/lib/paymob-server'
 import { getActiveDiscountPercent } from '@/lib/discounts'
+import { sendNewOrderEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,7 +72,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Add flat shipping (EGP)
-    totalAmount += 80
+    const shippingFee = 80
+    totalAmount += shippingFee
 
     // Create order in database first
     const { data: order, error: orderError } = await supabase
@@ -106,6 +108,35 @@ export async function POST(request: NextRequest) {
         quantity: item.quantity,
         price_at_purchase: unitPrice,
       })
+    }
+
+    // Fire-and-forget admin email notification on new order creation
+    try {
+      const emailItems = cartItems.map((item: any) => {
+        const product = productMap.get(item.product_id)!
+        const variant = variantMap.get(item.variant_id)!
+        const baseUnit = (product.base_price || 0) + (variant.price_adjustment || 0)
+        const percent = discountCache.get(item.product_id) || 0
+        const unitPrice = percent > 0 ? Math.max(0, baseUnit * (1 - percent / 100)) : baseUnit
+        return {
+          name: product.name,
+          size: variant.size,
+          color: variant.color,
+          quantity: item.quantity,
+          unitPrice,
+          lineTotal: unitPrice * item.quantity,
+        }
+      })
+      await sendNewOrderEmail({
+        orderId: order.id,
+        userEmail: user?.email || shippingAddress.email,
+        paymentMethod,
+        items: emailItems,
+        shippingAmount: shippingFee,
+        totalAmount,
+      })
+    } catch (e) {
+      console.error('sendNewOrderEmail failed:', e)
     }
 
     // If Cash on Delivery, skip Paymob and return orderId
