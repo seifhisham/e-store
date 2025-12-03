@@ -198,12 +198,12 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
                           setQuantity(1)
                         }
                       }}
-                      className={`px-3 py-2 rounded-full border text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-black ${
+                      className={`px-3 py-2 rounded-full border text-sm transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-black ${
                         disabled
-                          ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                          ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed relative overflow-hidden before:content-[""] before:absolute before:top-1/2 before:left-1/2 before:w-[calc(100%+8px)] before:h-[1.5px] before:bg-gray-300 before:transform before:-translate-x-1/2 before:-translate-y-1/2 before:origin-center before:rotate-[-30deg] before:z-10 before:opacity-90 before:transition-opacity hover:before:opacity-100'
                           : isActive
-                            ? 'bg-black text-white border-black'
-                            : 'bg-white text-black border-gray-300 hover:border-black'
+                            ? 'bg-black text-white border-black shadow-sm'
+                            : 'bg-white text-black border-gray-300 hover:border-black hover:shadow-sm'
                       }`}
                       aria-pressed={isActive}
                       aria-disabled={disabled}
@@ -293,7 +293,7 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
             className="w-full bg-black text-white hover:bg-primary hover:text-foreground"
             size="lg"
           >
-            {isAdding ? 'Adding to Cart...' : allOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+            {isAdding ? 'Adding to Cart...' : allOutOfStock ? 'Sold Out' : 'Add to Cart'}
           </Button>
           
           {/* <div className="flex space-x-4">
