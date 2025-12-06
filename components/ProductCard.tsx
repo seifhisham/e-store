@@ -76,11 +76,18 @@ export function ProductCard({ product, isNew, showActions = true, discountPercen
     <article className="group relative bg-card rounded-lg shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
       <Link href={`/products/${product.id}`} aria-label={`View details for ${product.name}`}>
         <div className="aspect-[3/4] relative overflow-hidden bg-neutral-100">
-          {isNew && (
-            <span className="absolute left-2 top-2 z-10 rounded-full bg-red-500 px-2 py-1 text-xs font-medium text-white" aria-label="New product">
-              New
-            </span>
-          )}
+          <div className="absolute left-2 top-2 z-10 flex flex-col gap-1">
+            {isNew && (
+              <span className="rounded-full bg-red-500 px-2 py-1 text-xs font-medium text-white" aria-label="New product">
+                New
+              </span>
+            )}
+            {allOutOfStock && (
+              <span className="rounded-full bg-gray-700 px-2 py-1 text-xs font-medium text-white" aria-label="Out of stock">
+                Sold Out
+              </span>
+            )}
+          </div>
           {discountPercent > 0 && (
             <span className="absolute right-2 top-2 z-10 rounded-full bg-black px-2 py-1 text-xs font-semibold text-white" aria-label={`Sale ${Math.round(discountPercent)}%`}>
               -{Math.round(discountPercent)}%
