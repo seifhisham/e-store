@@ -7,6 +7,7 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import ToasterClient from "@/components/ToasterClient";
 import { Analytics } from '@vercel/analytics/next';
+import MetaPixel from "@/components/MetaPixel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,23 +30,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="min-h-screen flex flex-col">
+        <MetaPixel />
         <AuthProvider>
           <CartProvider>
-            <div className="min-h-screen flex flex-col">
-              <Navigation />
-              <main className="flex-1">
-                {children}
-              </main>
-              <Footer />
-            </div>
+            <Navigation />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+            <ToasterClient />
+            <Analytics />
           </CartProvider>
         </AuthProvider>
-        <ToasterClient />
-        <Analytics />
       </body>
     </html>
   );
