@@ -26,8 +26,8 @@ export default function ReturnsPage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="rounded-lg border bg-white p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Return Window</h2>
-            <p className="text-sm text-gray-700">Returns are accepted within 14 days of delivery. Items must be requested for return within this period.</p>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">Return Policy</h2>
+            <p className="text-sm text-gray-700">The customer is allowed to check the product while the courier is present. Once the courier leaves, no returns or exchanges will be accepted. Shipping fees are non-refundable and must be paid even if the order is refused.</p>
           </div>
           <div className="rounded-lg border bg-white p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Item Condition</h2>
