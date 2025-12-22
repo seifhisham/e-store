@@ -27,19 +27,7 @@ export default function ReturnsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="rounded-lg border bg-white p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Return Policy</h2>
-            <p className="text-sm text-gray-700">The customer is allowed to check the product while the courier is present. Once the courier leaves, no returns or exchanges will be accepted. Shipping fees are non-refundable and must be paid even if the order is refused.</p>
-          </div>
-          <div className="rounded-lg border bg-white p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Item Condition</h2>
-            <p className="text-sm text-gray-700">Items must be unused, unwashed, and in their original condition with tags and packaging intact.</p>
-          </div>
-          <div className="rounded-lg border bg-white p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Non‑returnable Items</h2>
-            <p className="text-sm text-gray-700">Final‑sale items, gift cards, and items marked non‑returnable are not eligible for return.</p>
-          </div>
-          <div className="rounded-lg border bg-white p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Exchanges</h2>
-            <p className="text-sm text-gray-700">Need a different size or color? Request an exchange and we’ll guide you through available options based on stock.</p>
+            <p className="text-sm text-gray-700">The customer is allowed to inspect the product while the courier is present. Once the courier leaves, no returns or exchanges will be accepted. Refunds are accepted only in case of a manufacturing defect. The item must be unworn, unwashed, with original tags attached, and in its original condition. Shipping fees are non-refundable and must be paid even if the order is refused.</p>
           </div>
           <div className="rounded-lg border bg-white p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Refunds & Processing</h2>
