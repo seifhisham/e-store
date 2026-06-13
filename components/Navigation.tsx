@@ -6,9 +6,13 @@ import { useCart } from '@/contexts/CartContext'
 import { Button } from '@/components/ui/Button'
 import { ShoppingCart, User, Menu, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-import { CATEGORIES } from '@/lib/categories'
+import type { CategoryItem } from '@/lib/categories'
 
-export function Navigation() {
+type NavigationProps = {
+  categories: CategoryItem[]
+}
+
+export function Navigation({ categories }: NavigationProps) {
   const { user, signOut } = useAuth()
   const { getTotalItems } = useCart()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -106,7 +110,7 @@ export function Navigation() {
               </button>
               {isCategoriesOpen && (
                 <div className="ml-3 space-y-1">
-                  {CATEGORIES.map((c) => (
+                  {categories.map((c) => (
                     <Link
                       key={c.value}
                       href={{ pathname: '/products', query: { category: c.value } }}

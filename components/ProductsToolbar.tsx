@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { CATEGORIES } from '@/lib/categories'
+import type { CategoryItem } from '@/lib/categories'
 
 function Dropdown({
   value,
@@ -113,7 +113,15 @@ export type ProductsToolbarInitial = {
   sort?: string
 }
 
-export function ProductsToolbar({ initial, count }: { initial: ProductsToolbarInitial; count: number }) {
+export function ProductsToolbar({
+  initial,
+  count,
+  categories,
+}: {
+  initial: ProductsToolbarInitial
+  count: number
+  categories: CategoryItem[]
+}) {
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
@@ -157,7 +165,7 @@ export function ProductsToolbar({ initial, count }: { initial: ProductsToolbarIn
         <Dropdown
           value={initial.category || ''}
           placeholder="Category"
-          options={[{ label: 'Category', value: '' }, ...CATEGORIES.map((c) => ({ label: c.label, value: c.value }))]}
+          options={[{ label: 'Category', value: '' }, ...categories.map((c) => ({ label: c.label, value: c.value }))]}
           onChange={onCategory}
         />
 

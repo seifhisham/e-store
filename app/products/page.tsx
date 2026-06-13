@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Search } from 'lucide-react'
 import { ProductsToolbar } from '@/components/ProductsToolbar'
 import { getActiveDiscountPercent } from '@/lib/discounts'
+import { getCategories } from '@/lib/categories'
 
 
 interface SearchParams {
@@ -28,6 +29,7 @@ interface ProductsPageProps {
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const sp = await searchParams
   const supabase = await createClient()
+  const categories = await getCategories()
 
   // Build query based on search params
   let query = supabase
@@ -85,7 +87,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       return (
         <div className="min-h-screen bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <ProductsToolbar initial={sp} count={0} />
+            <ProductsToolbar initial={sp} count={0} categories={categories} />
             <div className="text-center py-12">
               <Search className="w-16 h-16 mx-auto mb-4 text-black" />
               <h3 className="text-lg font-medium text-black mb-2">No products found</h3>
@@ -150,7 +152,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         </div>
 
         {/* Top toolbar */}
-        <ProductsToolbar initial={sp} count={count || 0} />
+        <ProductsToolbar initial={sp} count={count || 0} categories={categories} />
 
         {/* Products Grid */}
         <div className="mt-6">

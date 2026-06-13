@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
-import { Navigation } from "@/components/Navigation";
+import { NavigationShell } from "@/components/NavigationShell";
 import { Footer } from "@/components/Footer";
 import ToasterClient from "@/components/ToasterClient";
 import { Analytics } from '@vercel/analytics/next';
@@ -35,7 +35,7 @@ export default function RootLayout({
         <MetaPixel />
         <AuthProvider>
           <CartProvider>
-            <Navigation />
+            <NavigationShell />
             <main className="flex-grow">{children}</main>
             <Footer />
             <ToasterClient />
