@@ -1,14 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
-import { CATEGORIES } from '@/lib/categories'
+import type { CategoryItem } from '@/lib/categories'
 import { COLOR_MAP } from '@/lib/colors'
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
@@ -27,7 +27,15 @@ export default function NewProductPage() {
   })
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([])
   const [dragOver, setDragOver] = useState(false)
+  const [categories, setCategories] = useState<CategoryItem[]>([])
   const fileInputsRef = useRef<Array<HTMLInputElement | null>>([])
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((json) => setCategories(json.categories || []))
+      .catch(() => {})
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -266,7 +274,7 @@ export default function NewProductPage() {
                 onChange={handleInputChange}
               >
                 <option value="">Select Category</option>
-                {CATEGORIES.map((c) => (
+                {categories.map((c) => (
                   <option key={c.value} value={c.value}>
                     {c.label}
                   </option>

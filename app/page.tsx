@@ -3,14 +3,15 @@ import { ProductCard } from "@/components/ProductCard";
 import { NewCollectionBanner } from "@/components/NewCollectionBanner";
 import { createClient } from "@/lib/supabase/server";
 import { HeroSection } from "@/components/HeroSection";
-import { CATEGORIES } from "@/lib/categories";
+import { getCategories } from "@/lib/categories";
 import { getActiveDiscountPercent } from "@/lib/discounts";
 
 export default async function Home() {
   const supabase = await createClient();
+  const categories = await getCategories();
   // Fetch up to 4 latest products per category
   const sections = await Promise.all(
-    CATEGORIES.map(async (cat) => {
+    categories.map(async (cat) => {
       const { data } = await supabase
         .from('products')
         .select(`

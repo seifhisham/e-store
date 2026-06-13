@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { Package, Users, ShoppingCart, Settings, LogOut } from 'lucide-react'
+import { Package, Users, ShoppingCart, Settings, LogOut, Tags } from 'lucide-react'
 
 export default async function AdminLayout({
   children,
@@ -75,6 +75,15 @@ export default async function AdminLayout({
                   >
                     <Package className="w-4 h-4 mr-3" />
                     Products
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/admin/categories"
+                    className="flex items-center px-3 py-2 text-sm font-medium text-foreground rounded-md hover:bg-foreground/10"
+                  >
+                    <Tags className="w-4 h-4 mr-3" />
+                    Categories
                   </Link>
                 </li>
                 <li>

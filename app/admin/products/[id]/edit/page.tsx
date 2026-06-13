@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
-import { CATEGORIES } from '@/lib/categories'
+import type { CategoryItem } from '@/lib/categories'
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 const COLORS = ['Black', 'White', 'Gray', 'Navy', 'Blue', 'Red', 'Green', 'Beige', 'Brown', 'Pink', 'Purple', 'Yellow', 'Orange']
@@ -43,7 +43,15 @@ export default function EditProductPage() {
   })
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([])
   const [dragOver, setDragOver] = useState(false)
+  const [categories, setCategories] = useState<CategoryItem[]>([])
   const fileInputsRef = useRef<Array<HTMLInputElement | null>>([])
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((json) => setCategories(json.categories || []))
+      .catch(() => {})
+  }, [])
 
   const [originalVariantIds, setOriginalVariantIds] = useState<string[]>([])
   const [originalImageIds, setOriginalImageIds] = useState<string[]>([])
@@ -346,7 +354,7 @@ export default function EditProductPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
               <Select name="category" required value={formData.category} onChange={handleInputChange}>
                 <option value="">Select Category</option>
-                {CATEGORIES.map((c) => (
+                {categories.map((c) => (
                   <option key={c.value} value={c.value}>
                     {c.label}
                   </option>
