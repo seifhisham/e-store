@@ -9,17 +9,13 @@ import { Select } from '@/components/ui/Select'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import type { CategoryItem } from '@/lib/categories'
+import { ProductVariantsEditor, type VariantFormRow } from '@/components/admin/ProductVariantsEditor'
+import { STANDARD_SIZES } from '@/lib/size-order'
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+const SIZES = [...STANDARD_SIZES]
 const COLORS = ['Black', 'White', 'Gray', 'Navy', 'Blue', 'Red', 'Green', 'Beige', 'Brown', 'Pink', 'Purple', 'Yellow', 'Orange']
 
-type VariantForm = {
-  id?: string
-  size: string
-  color: string
-  stock_quantity: string
-  price_adjustment: string
-}
+type VariantForm = VariantFormRow
 
 type ImageForm = {
   id?: string
@@ -92,7 +88,7 @@ export default function EditProductPage() {
           base_price,
           category,
           images:product_images(id, image_url, is_primary, display_order),
-          variants:product_variants(id, size, color, price_adjustment, stock_quantity)
+          variants:product_variants(id, size, color, price_adjustment, stock_quantity, display_order)
         `)
         .eq('id', productId)
         .single()
@@ -102,12 +98,16 @@ export default function EditProductPage() {
 
       const imagesSorted = (data.images || []).sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0))
 
+      const variantsSorted = (data.variants || []).sort(
+        (a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0)
+      )
+
       setFormData({
         name: data.name ?? '',
         description: data.description ?? '',
         base_price: data.base_price != null ? String(data.base_price) : '',
         category: data.category ?? '',
-        variants: (data.variants || []).map((v: any) => ({
+        variants: variantsSorted.map((v: any) => ({
           id: v.id,
           size: v.size ?? '',
           color: v.color ?? '',
@@ -117,7 +117,7 @@ export default function EditProductPage() {
         images: imagesSorted.map((img: any) => ({ id: img.id, url: img.image_url })),
       })
 
-      setOriginalVariantIds((data.variants || []).map((v: any) => v.id))
+      setOriginalVariantIds(variantsSorted.map((v: any) => v.id))
       setOriginalImageIds(imagesSorted.map((img: any) => img.id))
       setUploadingImages(new Array(imagesSorted.length).fill(false))
     } catch (err) {
@@ -132,27 +132,6 @@ export default function EditProductPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
-  const handleVariantChange = (index: number, field: keyof VariantForm, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      variants: prev.variants.map((v, i) => (i === index ? { ...v, [field]: value } : v)),
-    }))
-  }
-
-  const addVariant = () => {
-    setFormData(prev => ({
-      ...prev,
-      variants: [...prev.variants, { size: '', color: '', stock_quantity: '', price_adjustment: '' }],
-    }))
-  }
-
-  const removeVariant = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      variants: prev.variants.filter((_, i) => i !== index),
-    }))
   }
 
   const addImage = () => {
@@ -250,13 +229,15 @@ export default function EditProductPage() {
         if (delVarErr) throw delVarErr
       }
 
-      for (const v of formData.variants) {
+      for (let i = 0; i < formData.variants.length; i++) {
+        const v = formData.variants[i]
         const payload = {
           product_id: productId,
           size: v.size,
           color: v.color,
           stock_quantity: parseInt(v.stock_quantity || '0'),
           price_adjustment: Math.round(((parseFloat(v.price_adjustment || '0')) * 100)) / 100,
+          display_order: i,
         }
         if (v.id) {
           const { error } = await supabase.from('product_variants').update(payload).eq('id', v.id)
@@ -390,78 +371,12 @@ export default function EditProductPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Product Variants</h2>
-            <Button type="button" onClick={addVariant} size="sm" className="bg-black text-white hover:bg-primary hover:text-foreground">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Variant
-            </Button>
-          </div>
-
-          <datalist id="sizes-list">
-            {dynamicSizes.map((s) => (
-              <option key={s} value={s} />
-            ))}
-          </datalist>
-
-          {formData.variants.map((variant, index) => (
-            <div key={variant.id ?? index} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-4 border border-gray-200 rounded-lg">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
-                <Input
-                  value={variant.size}
-                  onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-                  placeholder="e.g. M or 32"
-                  list="sizes-list"
-                  className="placeholder:text-black"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
-                <Select
-                  value={variant.color}
-                  onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
-                >
-                  <option value="">Select color</option>
-                  {dynamicColors.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </Select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
-                <Input
-                  type="number"
-                  className="placeholder:text-black"
-                  value={variant.stock_quantity}
-                  onChange={(e) => handleVariantChange(index, 'stock_quantity', e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price Adjustment ($)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  className="placeholder:text-black"
-                  value={variant.price_adjustment}
-                  onChange={(e) => handleVariantChange(index, 'price_adjustment', e.target.value)}
-                  placeholder="0.00"
-                />
-              </div>
-
-              <div className="flex items-end">
-                <Button type="button" variant="outline" size="sm" onClick={() => removeVariant(index)} className="text-white hover:white">
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ProductVariantsEditor
+          variants={formData.variants}
+          onChange={(variants) => setFormData((prev) => ({ ...prev, variants }))}
+          sizes={dynamicSizes}
+          colors={dynamicColors}
+        />
 
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">

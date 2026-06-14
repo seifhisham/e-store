@@ -28,7 +28,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       base_price,
       category,
       images:product_images(image_url, is_primary, display_order),
-      variants:product_variants(id, size, color, price_adjustment, stock_quantity)
+      variants:product_variants(id, size, color, price_adjustment, stock_quantity, display_order)
     `)
     .eq('id', id)
     .single()
@@ -50,7 +50,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       base_price,
       category,
       images:product_images(image_url, is_primary),
-      variants:product_variants(id, size, color, price_adjustment, stock_quantity)
+      variants:product_variants(id, size, color, price_adjustment, stock_quantity, display_order)
     `)
     .eq('category', product.category)
     .neq('id', product.id)

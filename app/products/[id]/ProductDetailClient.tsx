@@ -21,6 +21,7 @@ interface Product {
     color: string
     price_adjustment: number
     stock_quantity: number
+    display_order?: number
   }[]
 }
 
@@ -31,7 +32,13 @@ interface ProductDetailClientProps {
 
 export function ProductDetailClient({ product, discountPercent = 0 }: ProductDetailClientProps) {
   const { addToCart } = useCart()
-  const firstAvailable = product.variants.find(v => (v.stock_quantity || 0) > 0) || product.variants[0]
+
+  const sortedVariants = useMemo(
+    () => [...product.variants].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)),
+    [product.variants]
+  )
+
+  const firstAvailable = sortedVariants.find(v => (v.stock_quantity || 0) > 0) || sortedVariants[0]
   const [selectedVariant, setSelectedVariant] = useState(firstAvailable)
   const [selectedSize, setSelectedSize] = useState(firstAvailable?.size || '')
   const [selectedColor, setSelectedColor] = useState(firstAvailable?.color || '')
@@ -44,19 +51,30 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
   const price = product.base_price + (selectedVariant?.price_adjustment || 0)
   const discountedPrice = discountPercent > 0 ? Math.max(0, price * (1 - discountPercent / 100)) : price
 
-  const sizes = useMemo(() => Array.from(new Set(product.variants.map(v => v.size))), [product.variants])
-  const colorsForSelectedSize = useMemo(() => {
-    return Array.from(new Set(product.variants.filter(v => v.size === selectedSize).map(v => v.color)))
-  }, [product.variants, selectedSize])
+  const sizes = useMemo(() => {
+    const seen = new Set<string>()
+    const result: string[] = []
+    for (const v of sortedVariants) {
+      if (!seen.has(v.size)) {
+        seen.add(v.size)
+        result.push(v.size)
+      }
+    }
+    return result
+  }, [sortedVariants])
 
-  const allOutOfStock = product.variants.length > 0 && product.variants.every(v => (v.stock_quantity || 0) <= 0)
+  const colorsForSelectedSize = useMemo(() => {
+    return Array.from(new Set(sortedVariants.filter(v => v.size === selectedSize).map(v => v.color)))
+  }, [sortedVariants, selectedSize])
+
+  const allOutOfStock = sortedVariants.length > 0 && sortedVariants.every(v => (v.stock_quantity || 0) <= 0)
 
   const isSizeOutOfStock = (size: string) => {
-    return product.variants.filter(v => v.size === size).every(v => (v.stock_quantity || 0) <= 0)
+    return sortedVariants.filter(v => v.size === size).every(v => (v.stock_quantity || 0) <= 0)
   }
 
   const getVariant = (size: string, color: string) => {
-    return product.variants.find(v => v.size === size && v.color === color)
+    return sortedVariants.find(v => v.size === size && v.color === color)
   }
 
   const isColorUnavailable = (size: string, color: string) => {
@@ -70,7 +88,7 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
     // If current selection is out of stock but some other variant is available, switch to it
     let variant = selectedVariant
     if ((variant.stock_quantity || 0) <= 0) {
-      const available = product.variants.find(v => (v.stock_quantity || 0) > 0)
+      const available = sortedVariants.find(v => (v.stock_quantity || 0) > 0)
       if (!available) {
         return
       }

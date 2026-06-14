@@ -10,8 +10,9 @@ import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import type { CategoryItem } from '@/lib/categories'
 import { COLOR_MAP } from '@/lib/colors'
+import { ProductVariantsEditor, createEmptyVariant } from '@/components/admin/ProductVariantsEditor'
+import { STANDARD_SIZES } from '@/lib/size-order'
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 const COLORS = Object.keys(COLOR_MAP).map(color => color.charAt(0).toUpperCase() + color.slice(1))
 
 export default function NewProductPage() {
@@ -22,7 +23,7 @@ export default function NewProductPage() {
     description: '',
     base_price: '',
     category: '',
-    variants: [{ size: '', color: '', stock_quantity: '', price_adjustment: '' }],
+    variants: [createEmptyVariant()],
     images: ['']
   })
   const [uploadingImages, setUploadingImages] = useState<boolean[]>([])
@@ -42,29 +43,6 @@ export default function NewProductPage() {
     setFormData(prev => ({
       ...prev,
       [name]: value
-    }))
-  }
-
-  const handleVariantChange = (index: number, field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      variants: prev.variants.map((variant, i) => 
-        i === index ? { ...variant, [field]: value } : variant
-      )
-    }))
-  }
-
-  const addVariant = () => {
-    setFormData(prev => ({
-      ...prev,
-      variants: [...prev.variants, { size: '', color: '', stock_quantity: '', price_adjustment: '' }]
-    }))
-  }
-
-  const removeVariant = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      variants: prev.variants.filter((_, i) => i !== index)
     }))
   }
 
@@ -181,6 +159,7 @@ export default function NewProductPage() {
       console.log('Product created successfully:', product)
 
       // Create variants
+      let variantOrder = 0
       for (const variant of formData.variants) {
         if (variant.size && variant.color) {
           console.log('Creating variant:', variant)
@@ -189,7 +168,8 @@ export default function NewProductPage() {
             size: variant.size,
             color: variant.color,
             stock_quantity: parseInt(variant.stock_quantity) || 0,
-            price_adjustment: Math.round(((parseFloat(variant.price_adjustment) || 0) * 100)) / 100
+            price_adjustment: Math.round(((parseFloat(variant.price_adjustment) || 0) * 100)) / 100,
+            display_order: variantOrder++,
           })
           
           if (variantError) {
@@ -314,93 +294,12 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        {/* Variants */}
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Product Variants</h2>
-            <Button type="button" onClick={addVariant} size="sm" className="bg-black text-white hover:bg-primary hover:text-foreground">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Variant
-            </Button>
-          </div>
-
-          <datalist id="sizes-list">
-            {SIZES.map((s) => (
-              <option key={s} value={s} />
-            ))}
-          </datalist>
-
-          {formData.variants.map((variant, index) => (
-            <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-4 border border-gray-200 rounded-lg">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Size
-                </label>
-                <Input
-                  value={variant.size}
-                  onChange={(e) => handleVariantChange(index, 'size', e.target.value)}
-                  placeholder="e.g. M or 32"
-                  list="sizes-list"
-                  className="placeholder:text-black"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Color
-                </label>
-                <Select
-                  value={variant.color}
-                  onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
-                >
-                  <option value="">Select color</option>
-                  {COLORS.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </Select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Stock Quantity
-                </label>
-                <Input
-                  type="number"
-                  className="placeholder:text-black"
-                  value={variant.stock_quantity}
-                  onChange={(e) => handleVariantChange(index, 'stock_quantity', e.target.value)}
-                  placeholder="0"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price Adjustment ($)
-                </label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  className="placeholder:text-black"
-                  value={variant.price_adjustment}
-                  onChange={(e) => handleVariantChange(index, 'price_adjustment', e.target.value)}
-                  placeholder="0.00"
-                />
-              </div>
-              
-              <div className="flex items-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => removeVariant(index)}
-                  className="text-white hover:white"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ProductVariantsEditor
+          variants={formData.variants}
+          onChange={(variants) => setFormData((prev) => ({ ...prev, variants }))}
+          sizes={[...new Set([...STANDARD_SIZES, ...formData.variants.map((v) => v.size).filter(Boolean)])]}
+          colors={COLORS}
+        />
 
         {/* Images */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
