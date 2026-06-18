@@ -5,7 +5,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'oyrfzypkbrotgotrqttf.supabase.co',
+        hostname: 'supabase.adoore.com.co',
         pathname: '/storage/**',
       },
       // Broad remote support (http/https)
