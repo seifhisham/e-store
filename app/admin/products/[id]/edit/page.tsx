@@ -11,6 +11,7 @@ import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import type { CategoryItem } from '@/lib/categories'
 import { ProductVariantsEditor, type VariantFormRow } from '@/components/admin/ProductVariantsEditor'
 import { prepareImageForUpload } from '@/lib/prepare-image-upload'
+import { STANDARD_SIZES } from '@/lib/size-order'
 
 const SIZES = [...STANDARD_SIZES]
 const COLORS = ['Black', 'White', 'Gray', 'Navy', 'Blue', 'Red', 'Green', 'Beige', 'Brown', 'Pink', 'Purple', 'Yellow', 'Orange']
