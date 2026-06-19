@@ -11,7 +11,7 @@ import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import type { CategoryItem } from '@/lib/categories'
 import { COLOR_MAP } from '@/lib/colors'
 import { ProductVariantsEditor, createEmptyVariant } from '@/components/admin/ProductVariantsEditor'
-import { STANDARD_SIZES } from '@/lib/size-order'
+import { prepareImageForUpload } from '@/lib/prepare-image-upload'
 
 const COLORS = Object.keys(COLOR_MAP).map(color => color.charAt(0).toUpperCase() + color.slice(1))
 
@@ -74,13 +74,14 @@ export default function NewProductPage() {
       setUploadingImages(prev => prev.map((uploading, i) => i === index ? true : uploading))
       
       const supabase = createClient()
-      const fileExt = file.name.split('.').pop()
+      const prepared = await prepareImageForUpload(file)
+      const fileExt = prepared.name.split('.').pop()
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
       const filePath = `products/${fileName}`
 
       const { error: uploadError } = await supabase.storage
         .from('product-images')
-        .upload(filePath, file)
+        .upload(filePath, prepared, { cacheControl: '31536000' })
 
       if (uploadError) throw uploadError
 

@@ -202,6 +202,8 @@ export default function CartPage() {
                             src={item.product.images.find(img => img.is_primary)?.image_url || '/placeholder.jpg'}
                             alt={item.product.name}
                             fill
+                            sizes="96px"
+                            quality={70}
                             className="object-cover"
                           />
                         </div>

@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import type { CategoryItem } from '@/lib/categories'
 import { ProductVariantsEditor, type VariantFormRow } from '@/components/admin/ProductVariantsEditor'
-import { STANDARD_SIZES } from '@/lib/size-order'
+import { prepareImageForUpload } from '@/lib/prepare-image-upload'
 
 const SIZES = [...STANDARD_SIZES]
 const COLORS = ['Black', 'White', 'Gray', 'Navy', 'Blue', 'Red', 'Green', 'Beige', 'Brown', 'Pink', 'Purple', 'Yellow', 'Orange']
@@ -155,11 +155,12 @@ export default function EditProductPage() {
     try {
       setUploadingImages(prev => prev.map((u, i) => (i === index ? true : u)))
       const supabase = createClient()
-      const fileExt = file.name.split('.').pop()
+      const prepared = await prepareImageForUpload(file)
+      const fileExt = prepared.name.split('.').pop()
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
       const filePath = `products/${fileName}`
 
-      const { error: uploadError } = await supabase.storage.from('product-images').upload(filePath, file)
+      const { error: uploadError } = await supabase.storage.from('product-images').upload(filePath, prepared, { cacheControl: '31536000' })
       if (uploadError) throw uploadError
 
       const { data } = supabase.storage.from('product-images').getPublicUrl(filePath)

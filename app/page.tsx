@@ -49,6 +49,10 @@ export default async function Home() {
     return now - created < fourteenDays;
   };
 
+  const priorityProductIds = new Set(
+    sections.flatMap((s) => s.products).slice(0, 4).map((p: { id: string }) => p.id)
+  );
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -70,7 +74,14 @@ export default async function Home() {
               </h2>
               <div className="mt-5 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {products.map((p: any) => (
-                  <ProductCard key={p.id} product={p} isNew={isNew(p.created_at)} showActions={false} discountPercent={discountMap.get(p.id) || 0} />
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    isNew={isNew(p.created_at)}
+                    showActions={false}
+                    discountPercent={discountMap.get(p.id) || 0}
+                    priority={priorityProductIds.has(p.id)}
+                  />
                 ))}
               </div>
               <div className="mt-6 flex justify-center">
