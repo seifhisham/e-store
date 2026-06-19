@@ -17,7 +17,7 @@ export function HeroBackgroundSlideshow({
   images,
   intervalMs = 5000,
   className,
-  quality = 95,
+  quality = 80,
   objectPosition = "center",
   onControls,
 }: HeroBackgroundSlideshowProps) {

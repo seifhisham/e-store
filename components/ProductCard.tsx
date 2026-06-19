@@ -29,9 +29,10 @@ interface ProductCardProps {
   isNew?: boolean
   showActions?: boolean
   discountPercent?: number
+  priority?: boolean
 }
 
-export function ProductCard({ product, isNew, showActions = true, discountPercent = 0 }: ProductCardProps) {
+export function ProductCard({ product, isNew, showActions = true, discountPercent = 0, priority = false }: ProductCardProps) {
   const { addToCart } = useCart()
   const [selectedVariant, setSelectedVariant] = useState(
     product.variants.find(v => (v.stock_quantity || 0) > 0) || product.variants[0]
@@ -97,8 +98,9 @@ export function ProductCard({ product, isNew, showActions = true, discountPercen
             src={primaryImage?.image_url || '/placeholder.jpg'}
             alt={product.name}
             fill
+            priority={priority}
+            quality={75}
             className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
-            loading="lazy"
             sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           />
         </div>

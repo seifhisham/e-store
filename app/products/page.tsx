@@ -158,8 +158,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <div className="mt-6">
             {products && products.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} discountPercent={discountPercents.get(product.id) || 0} />
+                {products.map((product, index) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    discountPercent={discountPercents.get(product.id) || 0}
+                    priority={page === 1 && index < 4}
+                  />
                 ))}
               </div>
             ) : (

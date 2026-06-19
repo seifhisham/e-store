@@ -156,6 +156,8 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
                   src={image.image_url}
                   alt={`${product.name} ${index + 1}`}
                   fill
+                  sizes="(max-width: 768px) 25vw, 12vw"
+                  quality={70}
                   className="object-cover"
                 />
               </button>
