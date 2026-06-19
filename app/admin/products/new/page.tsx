@@ -12,6 +12,7 @@ import type { CategoryItem } from '@/lib/categories'
 import { COLOR_MAP } from '@/lib/colors'
 import { ProductVariantsEditor, createEmptyVariant } from '@/components/admin/ProductVariantsEditor'
 import { prepareImageForUpload } from '@/lib/prepare-image-upload'
+import { STANDARD_SIZES } from '@/lib/size-order'
 
 const COLORS = Object.keys(COLOR_MAP).map(color => color.charAt(0).toUpperCase() + color.slice(1))
 
