@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { Minus, Plus, Heart, Share2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { getColorHex } from '@/lib/colors'
+import { compareSizes } from '@/lib/size-order'
 
 interface Product {
   id: string
@@ -60,7 +61,7 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
         result.push(v.size)
       }
     }
-    return result
+    return result.sort(compareSizes)
   }, [sortedVariants])
 
   const colorsForSelectedSize = useMemo(() => {
