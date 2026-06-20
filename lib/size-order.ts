@@ -1,4 +1,4 @@
-export const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const
+export const STANDARD_SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'] as const
 
 const LETTER_SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
 
