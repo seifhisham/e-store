@@ -12,7 +12,7 @@ import type { CategoryItem } from '@/lib/categories'
 import { COLOR_MAP } from '@/lib/colors'
 import { ProductVariantsEditor, createEmptyVariant } from '@/components/admin/ProductVariantsEditor'
 import { prepareImageForUpload } from '@/lib/prepare-image-upload'
-import { STANDARD_SIZES } from '@/lib/size-order'
+import { STANDARD_SIZES, compareSizes } from '@/lib/size-order'
 
 const COLORS = Object.keys(COLOR_MAP).map(color => color.charAt(0).toUpperCase() + color.slice(1))
 
@@ -299,7 +299,7 @@ export default function NewProductPage() {
         <ProductVariantsEditor
           variants={formData.variants}
           onChange={(variants) => setFormData((prev) => ({ ...prev, variants }))}
-          sizes={[...new Set([...STANDARD_SIZES, ...formData.variants.map((v) => v.size).filter(Boolean)])]}
+          sizes={[...new Set([...STANDARD_SIZES, ...formData.variants.map((v) => v.size).filter(Boolean)])].sort(compareSizes)}
           colors={COLORS}
         />
 

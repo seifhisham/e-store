@@ -11,6 +11,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { formatCurrency } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { getColorHex } from '@/lib/colors'
+import { compareSizes } from '@/lib/size-order'
 
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, getTotalPrice, loading, changeVariant } = useCart()
@@ -221,7 +222,7 @@ export default function CartPage() {
                           <div>
                             <p className="text-xs text-black/60 mb-1">Size</p>
                             <div className="flex gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible scroll-smooth">
-                              {Array.from(new Set((variantsByProduct[item.product_id] || []).map(v => v.size))).map((size) => {
+                              {Array.from(new Set((variantsByProduct[item.product_id] || []).map(v => v.size))).sort(compareSizes).map((size) => {
                                 const selectedSize = selSize[item.id] ?? item.variant.size
                                 const isActive = selectedSize === size
                                 const sizeOOS = (variantsByProduct[item.product_id] || [])
