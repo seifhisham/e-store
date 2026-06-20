@@ -9,12 +9,12 @@ import { Select } from '@/components/ui/Select'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react'
 import type { CategoryItem } from '@/lib/categories'
-import { COLOR_MAP } from '@/lib/colors'
+import { STANDARD_COLORS } from '@/lib/colors'
 import { ProductVariantsEditor, createEmptyVariant } from '@/components/admin/ProductVariantsEditor'
 import { prepareImageForUpload } from '@/lib/prepare-image-upload'
 import { STANDARD_SIZES, compareSizes } from '@/lib/size-order'
 
-const COLORS = Object.keys(COLOR_MAP).map(color => color.charAt(0).toUpperCase() + color.slice(1))
+const COLORS = [...STANDARD_COLORS]
 
 export default function NewProductPage() {
   const router = useRouter()
