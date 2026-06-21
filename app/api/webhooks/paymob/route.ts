@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import crypto from 'crypto'
+import { trackMetaPurchaseForPaymobOrder } from '@/lib/meta-track-purchase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -64,6 +65,10 @@ export async function POST(request: NextRequest) {
           .delete()
           .eq('user_id', order.user_id)
       }
+
+      trackMetaPurchaseForPaymobOrder(String(order_id)).catch((error) => {
+        console.error('[Meta CAPI] Paymob purchase event failed:', error)
+      })
     }
 
     return NextResponse.json({ success: true })

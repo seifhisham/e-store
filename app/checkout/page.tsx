@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select'
 import { useRouter } from 'next/navigation'
 import { CreditCard, Lock } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import { trackMetaEvent } from '@/lib/meta-events-client'
 
 export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCart()
@@ -18,6 +19,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod' | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
+  const trackedInitiateCheckout = useRef(false)
 
   // Fetch active discount percentages for products in the cart to reflect UI totals
   const [discounts, setDiscounts] = useState<Record<string, number>>({})
@@ -179,6 +181,18 @@ export default function CheckoutPage() {
   }, [items])
   const savings = Math.max(0, originalSubtotal - discountedSubtotal)
   const total = discountedSubtotal + shipping
+
+  useEffect(() => {
+    if (trackedInitiateCheckout.current || items.length === 0) return
+    trackedInitiateCheckout.current = true
+
+    trackMetaEvent('InitiateCheckout', {
+      value: total,
+      currency: 'EGP',
+      contentIds: items.map((item) => item.product_id),
+      numItems: items.reduce((sum, item) => sum + item.quantity, 0),
+    })
+  }, [items, total])
 
   return (
     <div className="min-h-screen bg-gray-50">
