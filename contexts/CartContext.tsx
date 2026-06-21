@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from './AuthContext'
+import { trackMetaEvent } from '@/lib/meta-events-client'
 
 interface CartItem {
   id: string
@@ -151,6 +152,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error
       const newItem = normalizeItem(data)
       setItems(prev => [...prev, newItem])
+
+      const unitPrice = newItem.product.base_price + newItem.variant.price_adjustment
+      trackMetaEvent('AddToCart', {
+        contentIds: [productId],
+        contentType: 'product',
+        contentName: newItem.product.name,
+        value: unitPrice * quantity,
+        currency: 'EGP',
+        numItems: quantity,
+      })
     } catch (error) {
       console.error('Error adding to cart:', error)
       throw error

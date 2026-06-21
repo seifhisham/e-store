@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { CheckCircle, Package, Mail } from 'lucide-react'
 import Link from 'next/link'
+import { trackMetaEvent } from '@/lib/meta-events-client'
 
 export default function CheckoutSuccessClient() {
   const searchParams = useSearchParams()
@@ -37,6 +38,7 @@ export default function CheckoutSuccessClient() {
             id,
             quantity,
             price_at_purchase,
+            product_id,
             product:products(name),
             variant:product_variants(size, color)
           )
@@ -52,6 +54,40 @@ export default function CheckoutSuccessClient() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!order) return
+
+    const storageKey = `meta_purchase_${order.id}`
+    if (sessionStorage.getItem(storageKey)) return
+    sessionStorage.setItem(storageKey, '1')
+
+    const shipping = (order.shipping_address || {}) as Record<string, string | undefined>
+    const orderItems = (order.order_items || []) as Array<{ product_id?: string; quantity: number }>
+
+    trackMetaEvent(
+      'Purchase',
+      {
+        value: order.total_amount,
+        currency: 'EGP',
+        contentIds: orderItems.map((item) => item.product_id).filter(Boolean) as string[],
+        contentType: 'product',
+        numItems: orderItems.reduce((sum, item) => sum + item.quantity, 0),
+        orderId: order.id,
+      },
+      `purchase_${order.id}`,
+      {
+        email: shipping.email,
+        phone: shipping.phone,
+        firstName: shipping.firstName,
+        lastName: shipping.lastName,
+        city: shipping.city,
+        state: shipping.state,
+        zipCode: shipping.zipCode,
+        country: shipping.country || 'eg',
+      }
+    )
+  }, [order])
 
   if (loading) {
     return (

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createPaymentRequest } from '@/lib/paymob-server'
 import { getActiveDiscountPercent } from '@/lib/discounts'
 import { sendNewOrderEmail } from '@/lib/email'
+import { trackMetaPurchaseForOrder } from '@/lib/meta-track-purchase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -145,6 +146,11 @@ export async function POST(request: NextRequest) {
       if (user?.id) {
         await supabase.from('cart_items').delete().eq('user_id', user.id)
       }
+
+      trackMetaPurchaseForOrder(order.id).catch((error) => {
+        console.error('[Meta CAPI] COD purchase event failed:', error)
+      })
+
       return NextResponse.json({ orderId: order.id })
     }
 

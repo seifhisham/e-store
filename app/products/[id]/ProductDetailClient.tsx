@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useCart } from '@/contexts/CartContext'
 import { Button } from '@/components/ui/Button'
 import Image from 'next/image'
@@ -8,6 +8,7 @@ import { Minus, Plus, Heart, Share2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { getColorHex } from '@/lib/colors'
 import { compareSizes } from '@/lib/size-order'
+import { trackMetaEvent } from '@/lib/meta-events-client'
 
 interface Product {
   id: string
@@ -51,6 +52,20 @@ export function ProductDetailClient({ product, discountPercent = 0 }: ProductDet
   const sortedImages = [...product.images].sort((a, b) => a.display_order - b.display_order)
   const price = product.base_price + (selectedVariant?.price_adjustment || 0)
   const discountedPrice = discountPercent > 0 ? Math.max(0, price * (1 - discountPercent / 100)) : price
+
+  useEffect(() => {
+    trackMetaEvent(
+      'ViewContent',
+      {
+        contentIds: [product.id],
+        contentType: 'product',
+        contentName: product.name,
+        value: discountedPrice,
+        currency: 'EGP',
+      },
+      `viewcontent_${product.id}`
+    )
+  }, [product.id, product.name, discountedPrice])
 
   const sizes = useMemo(() => {
     const seen = new Set<string>()
