@@ -15,7 +15,6 @@ export function HeroSection() {
           muted
           playsInline
           preload="auto"
-          poster="/images/hero-1.jpg"
           className="absolute inset-0 h-full w-full object-contain"
         >
           <source src="/videos/hero-1.mp4" type="video/mp4" />
