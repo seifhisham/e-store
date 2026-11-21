@@ -164,7 +164,7 @@ export default function CheckoutPage() {
     }
   }
 
-  const shipping = 80
+  const shipping = 90
   const discountedSubtotal = useMemo(() => {
     return items.reduce((total, item) => {
       const base = (item.product.base_price || 0) + (item.variant.price_adjustment || 0)

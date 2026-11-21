@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Add flat shipping (EGP)
-    const shippingFee = 80
+    const shippingFee = 90
     totalAmount += shippingFee
 
     // Create order in database first

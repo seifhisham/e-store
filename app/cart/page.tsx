@@ -16,7 +16,7 @@ import { compareSizes } from '@/lib/size-order'
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, getTotalPrice, loading, changeVariant } = useCart()
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
-  const shipping = 80
+  const shipping = 90
 
   const [discounts, setDiscounts] = useState<Record<string, number>>({})
   const [variantsByProduct, setVariantsByProduct] = useState<Record<string, Array<{ id: string; product_id: string; size: string; color: string; price_adjustment: number; stock_quantity: number }>>>({})
